@@ -1,6 +1,7 @@
 import pygame
 import pyodbc
 import matplotlib.pyplot as plt
+import csv
 from config import VENTANA, ANCHO, fuente, pequena, BLANCO
 import os
 
@@ -45,7 +46,7 @@ class PantallaEstadisticas:
 
     def generar_graficos(self):
         try:
-            # Barras: solo los que salieron
+            # Barras
             numeros, cantidades, colores_barras = [], [], []
             for i in range(37):
                 if self.frecuencias[i] > 0:
@@ -53,7 +54,7 @@ class PantallaEstadisticas:
                     cantidades.append(self.frecuencias[i])
                     colores_barras.append("green" if i == 0 else "red" if i in rojos else "black")
 
-            plt.figure(figsize=(8, 3), dpi=130)
+            plt.figure(figsize=(8.5, 3.5), dpi=200)
             plt.bar(numeros, cantidades, color=colores_barras)
             plt.xticks(numeros, fontsize=9)
             plt.yticks(fontsize=9)
@@ -73,7 +74,7 @@ class PantallaEstadisticas:
                     valores.append(count)
                     colores_pie.append("red" if color == "rojo" else "black" if color == "negro" else "green")
 
-            plt.figure(figsize=(4.2, 4.2), dpi=130)
+            plt.figure(figsize=(4.5, 4.5), dpi=200)
             wedges, texts, autotexts = plt.pie(
                 valores, labels=labels, colors=colores_pie, autopct='%1.1f%%',
                 startangle=90, textprops={'color': 'white', 'fontsize': 12}
@@ -89,11 +90,29 @@ class PantallaEstadisticas:
         except Exception as e:
             print(f"❌ Error al generar gráficos: {e}")
 
+    def exportar_csv(self):
+        try:
+            with open("resultados_ruleta.csv", mode='w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Numero", "Frecuencia", "Porcentaje", "Color"])
+
+                for i in range(37):
+                    if self.frecuencias[i] > 0:
+                        porcentaje = (self.frecuencias[i] / self.total) * 100
+                        color = "verde" if i == 0 else "rojo" if i in rojos else "negro"
+                        writer.writerow([i, self.frecuencias[i], f"{porcentaje:.1f}%", color])
+
+            print("✅ Archivo 'resultados_ruleta.csv' exportado correctamente.")
+        except Exception as e:
+            print(f"❌ Error al exportar CSV: {e}")
+
     def manejar_evento(self, evento):
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
             if self.boton_volver.collidepoint(x, y):
                 self.volver_callback()
+            elif self.boton_exportar.collidepoint(x, y):
+                self.exportar_csv()
 
     def actualizar(self):
         pass
@@ -117,7 +136,7 @@ class PantallaEstadisticas:
             img_pie = pygame.transform.scale(img_pie, (240, 240))
             ventana.blit(img_pie, (80, 260))
 
-        # Tabla (a la derecha del gráfico de pastel)
+        # Tabla de frecuencias
         y_base = 260
         x_col1 = 350
         x_col2 = x_col1 + 70
@@ -151,3 +170,10 @@ class PantallaEstadisticas:
         texto_btn = fuente.render("Volver", True, (0, 0, 0))
         ventana.blit(texto_btn, (self.boton_volver.centerx - texto_btn.get_width() // 2,
                                  self.boton_volver.centery - 12))
+
+        # Botón Exportar CSV
+        self.boton_exportar = pygame.Rect(ANCHO // 2 + 80, 570, 160, 35)
+        pygame.draw.rect(ventana, (100, 200, 100), self.boton_exportar)
+        texto_exp = fuente.render("Exportar CSV", True, (0, 0, 0))
+        ventana.blit(texto_exp, (self.boton_exportar.centerx - texto_exp.get_width() // 2,
+                                 self.boton_exportar.centery - 12))
