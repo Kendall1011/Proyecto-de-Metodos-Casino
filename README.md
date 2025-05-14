@@ -41,3 +41,4 @@ Proyecto-de-Metodos-Casino/
 ├── pantalla_juego.py # Pantalla principal de juego (1 jugador)
 ├── datos_juego.py # Datos como fichas, números, colores, etc.
 └── README.md # Documentación del proyecto
+
