@@ -7,6 +7,9 @@ from bd import guardar_resultado
 from funciones_dibujo import dibujar_ruleta, dibujar_bolita, dibujar_tablero, dibujar_fichas, dibujar_apuestas, obtener_numero
 
 class PantallaJuego:
+    def __init__(self, cambiar_pantalla_callback):
+        self.cambiar_pantalla = cambiar_pantalla_callback
+
     def manejar_evento(self, evento):
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
@@ -24,67 +27,65 @@ class PantallaJuego:
                     EstadoJuego.apuestas.append((num, EstadoJuego.ficha_seleccionada))
 
             # Botón girar
-                if self.boton_girar.collidepoint(x, y) and not EstadoJuego.girando:
-                    EstadoJuego.velocidad = random.uniform(10, 20)
-                    EstadoJuego.girando = True
-                    EstadoJuego.resultado_final = None
-                    EstadoJuego.mensaje_resultado = ""
-                    EstadoJuego.resultado_guardado = False  # ← MUY IMPORTANTE
+            if self.boton_girar.collidepoint(x, y) and not EstadoJuego.girando:
+                EstadoJuego.velocidad = random.uniform(10, 20)
+                EstadoJuego.girando = True
+                EstadoJuego.resultado_final = None
+                EstadoJuego.mensaje_resultado = ""
+                EstadoJuego.resultado_guardado = False
 
-                elif self.boton_borrar.collidepoint(x, y):
-                    EstadoJuego.apuestas.clear()
-
-                elif self.boton_repetir.collidepoint(x, y):
-                    EstadoJuego.apuestas.clear()
-                    EstadoJuego.apuestas.extend(EstadoJuego.apuesta_anterior)
-
-
-    def actualizar(self):
-    # Solo animar si está girando
-        if EstadoJuego.girando:
-            EstadoJuego.angulo_ruleta += EstadoJuego.velocidad
-        EstadoJuego.bola_angulo -= EstadoJuego.velocidad * 1.5
-        EstadoJuego.velocidad *= 0.98  # Reduce la velocidad progresivamente
-
-        # Cuando la velocidad cae por debajo de 0.1, detener
-        if EstadoJuego.velocidad < 0.1:
-            EstadoJuego.girando = False
-
-            if not EstadoJuego.resultado_guardado:
-                # Calcular el número donde cae la bolita
-                EstadoJuego.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
-                EstadoJuego.mensaje_resultado = "Perdiste"
-
-                # Obtener color del resultado
-                if EstadoJuego.resultado_final is not None:
-                    if EstadoJuego.resultado_final == 0:
-                        color = "verde"
-                    elif EstadoJuego.resultado_final in rojos:
-                        color = "rojo"
-                    else:
-                        color = "negro"
-
-                    # Guardar solo una vez
-                    guardar_resultado(EstadoJuego.resultado_final, color)
-                    EstadoJuego.resultado_guardado = True
-
-                # Evaluar si ganó con alguna apuesta
-                for apuesta, _ in EstadoJuego.apuestas:
-                    if (
-                        (isinstance(apuesta, int) and apuesta == EstadoJuego.resultado_final) or
-                        (apuesta == "ROJO" and EstadoJuego.resultado_final in rojos) or
-                        (apuesta == "NEGRO" and EstadoJuego.resultado_final in negros) or
-                        (apuesta == "PAR" and EstadoJuego.resultado_final % 2 == 0 and EstadoJuego.resultado_final != 0) or
-                        (apuesta == "IMPAR" and EstadoJuego.resultado_final % 2 == 1) or
-                        (apuesta == "1-18" and 1 <= EstadoJuego.resultado_final <= 18) or
-                        (apuesta == "19-36" and 19 <= EstadoJuego.resultado_final <= 36)
-                    ):
-                        EstadoJuego.mensaje_resultado = "¡Ganaste!"
-                        break
-
-                EstadoJuego.apuesta_anterior = EstadoJuego.apuestas[:]
+            # Botón borrar
+            elif self.boton_borrar.collidepoint(x, y):
                 EstadoJuego.apuestas.clear()
 
+            # Botón repetir
+            elif self.boton_repetir.collidepoint(x, y):
+                EstadoJuego.apuestas.clear()
+                EstadoJuego.apuestas.extend(EstadoJuego.apuesta_anterior)
+
+            # Botón estadísticas
+            elif self.boton_estadisticas.collidepoint(x, y):
+                self.cambiar_pantalla("estadisticas")
+
+    def actualizar(self):
+        if EstadoJuego.girando:
+            EstadoJuego.angulo_ruleta += EstadoJuego.velocidad
+            EstadoJuego.bola_angulo -= EstadoJuego.velocidad * 1.5
+            EstadoJuego.velocidad *= 0.98
+
+            if EstadoJuego.velocidad < 0.1:
+                EstadoJuego.girando = False
+
+                if not EstadoJuego.resultado_guardado:
+                    EstadoJuego.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
+                    EstadoJuego.mensaje_resultado = "Perdiste"
+
+                    if EstadoJuego.resultado_final is not None:
+                        if EstadoJuego.resultado_final == 0:
+                            color = "verde"
+                        elif EstadoJuego.resultado_final in rojos:
+                            color = "rojo"
+                        else:
+                            color = "negro"
+
+                        guardar_resultado(EstadoJuego.resultado_final, color)
+                        EstadoJuego.resultado_guardado = True
+
+                    for apuesta, _ in EstadoJuego.apuestas:
+                        if (
+                            (isinstance(apuesta, int) and apuesta == EstadoJuego.resultado_final) or
+                            (apuesta == "ROJO" and EstadoJuego.resultado_final in rojos) or
+                            (apuesta == "NEGRO" and EstadoJuego.resultado_final in negros) or
+                            (apuesta == "PAR" and EstadoJuego.resultado_final % 2 == 0 and EstadoJuego.resultado_final != 0) or
+                            (apuesta == "IMPAR" and EstadoJuego.resultado_final % 2 == 1) or
+                            (apuesta == "1-18" and 1 <= EstadoJuego.resultado_final <= 18) or
+                            (apuesta == "19-36" and 19 <= EstadoJuego.resultado_final <= 36)
+                        ):
+                            EstadoJuego.mensaje_resultado = "¡Ganaste!"
+                            break
+
+                    EstadoJuego.apuesta_anterior = EstadoJuego.apuestas[:]
+                    EstadoJuego.apuestas.clear()
 
     def dibujar(self, ventana):
         ventana.fill((18, 78, 22))
@@ -118,3 +119,11 @@ class PantallaJuego:
         self.boton_repetir = pygame.Rect(770, 620, 100, 30)
         pygame.draw.rect(VENTANA, (50, 120, 200), self.boton_repetir)
         ventana.blit(pequena.render("Repetir", True, BLANCO), (self.boton_repetir.centerx - 25, self.boton_repetir.centery - 7))
+
+        # Botón ESTADÍSTICAS
+       # Botón ESTADÍSTICAS (pequeño, esquina superior derecha)
+        self.boton_estadisticas = pygame.Rect(ANCHO - 140, 10, 120, 30)
+        pygame.draw.rect(VENTANA, (50, 150, 255), self.boton_estadisticas)
+        texto_est = pequena.render("Estadísticas", True, (0, 0, 0))
+        VENTANA.blit(texto_est, (self.boton_estadisticas.centerx - texto_est.get_width() // 2,
+                         self.boton_estadisticas.centery - 8))
