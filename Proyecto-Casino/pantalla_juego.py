@@ -3,6 +3,7 @@ import random
 from config import VENTANA, ANCHO, fuente, grande, pequena, BLANCO, DORADO, NEGRO
 from estado_juego import EstadoJuego
 from datos_juego import fichas, rojos, negros
+from bd import guardar_resultado
 from funciones_dibujo import dibujar_ruleta, dibujar_bolita, dibujar_tablero, dibujar_fichas, dibujar_apuestas, obtener_numero
 
 class PantallaJuego:
@@ -23,30 +24,51 @@ class PantallaJuego:
                     EstadoJuego.apuestas.append((num, EstadoJuego.ficha_seleccionada))
 
             # Botón girar
-            if self.boton_girar.collidepoint(x, y) and not EstadoJuego.girando:
-                EstadoJuego.velocidad = random.uniform(10, 20)
-                EstadoJuego.girando = True
-                EstadoJuego.resultado_final = None
-                EstadoJuego.mensaje_resultado = ""
+                if self.boton_girar.collidepoint(x, y) and not EstadoJuego.girando:
+                    EstadoJuego.velocidad = random.uniform(10, 20)
+                    EstadoJuego.girando = True
+                    EstadoJuego.resultado_final = None
+                    EstadoJuego.mensaje_resultado = ""
+                    EstadoJuego.resultado_guardado = False  # ← MUY IMPORTANTE
 
-            elif self.boton_borrar.collidepoint(x, y):
-                EstadoJuego.apuestas.clear()
+                elif self.boton_borrar.collidepoint(x, y):
+                    EstadoJuego.apuestas.clear()
 
-            elif self.boton_repetir.collidepoint(x, y):
-                EstadoJuego.apuestas.clear()
-                EstadoJuego.apuestas.extend(EstadoJuego.apuesta_anterior)
+                elif self.boton_repetir.collidepoint(x, y):
+                    EstadoJuego.apuestas.clear()
+                    EstadoJuego.apuestas.extend(EstadoJuego.apuesta_anterior)
+
 
     def actualizar(self):
+    # Solo animar si está girando
         if EstadoJuego.girando:
             EstadoJuego.angulo_ruleta += EstadoJuego.velocidad
-            EstadoJuego.bola_angulo -= EstadoJuego.velocidad * 1.5
-            EstadoJuego.velocidad *= 0.98
+        EstadoJuego.bola_angulo -= EstadoJuego.velocidad * 1.5
+        EstadoJuego.velocidad *= 0.98  # Reduce la velocidad progresivamente
 
-            if EstadoJuego.velocidad < 0.1:
-                EstadoJuego.girando = False
+        # Cuando la velocidad cae por debajo de 0.1, detener
+        if EstadoJuego.velocidad < 0.1:
+            EstadoJuego.girando = False
+
+            if not EstadoJuego.resultado_guardado:
+                # Calcular el número donde cae la bolita
                 EstadoJuego.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
                 EstadoJuego.mensaje_resultado = "Perdiste"
 
+                # Obtener color del resultado
+                if EstadoJuego.resultado_final is not None:
+                    if EstadoJuego.resultado_final == 0:
+                        color = "verde"
+                    elif EstadoJuego.resultado_final in rojos:
+                        color = "rojo"
+                    else:
+                        color = "negro"
+
+                    # Guardar solo una vez
+                    guardar_resultado(EstadoJuego.resultado_final, color)
+                    EstadoJuego.resultado_guardado = True
+
+                # Evaluar si ganó con alguna apuesta
                 for apuesta, _ in EstadoJuego.apuestas:
                     if (
                         (isinstance(apuesta, int) and apuesta == EstadoJuego.resultado_final) or
@@ -62,6 +84,7 @@ class PantallaJuego:
 
                 EstadoJuego.apuesta_anterior = EstadoJuego.apuestas[:]
                 EstadoJuego.apuestas.clear()
+
 
     def dibujar(self, ventana):
         ventana.fill((18, 78, 22))

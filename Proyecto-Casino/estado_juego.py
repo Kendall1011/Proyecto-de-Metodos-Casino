@@ -18,6 +18,8 @@ class EstadoJuego:
     apuestas = []
     apuesta_anterior = []
     mensaje_resultado = ""
+    resultado_guardado = False
+
 
     # Tablero
     casillas = []
