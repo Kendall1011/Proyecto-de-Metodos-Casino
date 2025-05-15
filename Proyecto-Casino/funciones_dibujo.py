@@ -129,3 +129,11 @@ def dibujar_apuestas():
                 color, _ = fichas[ficha_index]
                 pygame.draw.circle(VENTANA, color, rect.center, 8)
                 pygame.draw.circle(VENTANA, NEGRO, rect.center, 8, 1)
+def dibujar_apuestas_color(apuestas):
+    for num, color in apuestas:
+        for n, rect in EstadoJuego.casillas + EstadoJuego.casillas_extra:
+            if n == num:
+                x, y, w, h = rect
+                cx = x + w // 2
+                cy = y + h // 2
+                pygame.draw.circle(VENTANA, color, (cx, cy), 10)

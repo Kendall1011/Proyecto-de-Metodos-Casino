@@ -4,6 +4,8 @@ from config import VENTANA
 from pantalla_inicio import PantallaInicio
 from pantalla_juego import PantallaJuego
 from pantalla_estadisticas import PantallaEstadisticas
+from pantalla_juego2 import Pantalla_juego2
+
 
 
 # Variable global para la pantalla actual
@@ -16,8 +18,11 @@ def cambiar_pantalla(nombre):
         pantalla_actual = PantallaInicio(cambiar_pantalla)
     elif nombre == "juego":
         pantalla_actual = PantallaJuego(cambiar_pantalla)
+    elif nombre == "juego2":
+        pantalla_actual = Pantalla_juego2(cambiar_pantalla)
     elif nombre == "estadisticas":
         pantalla_actual = PantallaEstadisticas(lambda: cambiar_pantalla("juego"))
+
 
 
 # Bucle principal del juego
