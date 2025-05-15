@@ -64,14 +64,14 @@ class Pantalla_juego2:
                 self.ficha_seleccionada = None
 
             if self.boton_borrar.collidepoint(x, y):
-                self.apuestas_j1.clear()
-                self.apuestas_j2.clear()
-                self.ficha_seleccionada = None
-                self.ganador = ""
-                self.resultado_final = None
-                EstadoJuego.resultado_guardado = False
-                EstadoJuego.resultado_final = None
-                EstadoJuego.girando = False
+                if self.turno == 1:
+                     self.apuestas_j1.clear()
+                else:
+                    self.apuestas_j2.clear()
+                    self.ficha_seleccionada = None
+
+
+
     def actualizar(self):
         if EstadoJuego.girando:
             EstadoJuego.angulo_ruleta += EstadoJuego.velocidad
@@ -154,8 +154,11 @@ class Pantalla_juego2:
         dibujar_ruleta()
         dibujar_bolita()
         dibujar_tablero()
-        dibujar_apuestas_color(self.apuestas_j1)
-        dibujar_apuestas_color(self.apuestas_j2)
+        EstadoJuego.apuestas.clear()
+        EstadoJuego.apuestas.extend(self.apuestas_j1)
+        EstadoJuego.apuestas.extend(self.apuestas_j2)
+        dibujar_apuestas_color(EstadoJuego.apuestas)
+
 
         if self.resultado_final is not None:
             texto = fuente.render(f"Número: {self.resultado_final}", True, BLANCO)
