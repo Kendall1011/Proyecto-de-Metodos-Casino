@@ -53,7 +53,7 @@ class PantallaInicio:
         # Información del proyecto
         linea1 = fuente.render("Proyecto Métodos Cuantitativos 2025", True, BLANCO)
         linea2 = fuente.render("- Kendall Leon", True, BLANCO)
-        linea3 = fuente.render("- Nombre 2", True, BLANCO)
+        linea3 = fuente.render("- Anderson Umaña", True, BLANCO)
         linea4 = fuente.render("- Nombre 3", True, BLANCO)
 
         ventana.blit(linea1, (ANCHO // 2 - linea1.get_width() // 2, y_ficha + 60))
@@ -62,15 +62,29 @@ class PantallaInicio:
         ventana.blit(linea4, (ANCHO // 2 - linea4.get_width() // 2, y_ficha + 150))
 
         # Botón de inicio (centrado)
+         # Botones de inicio (centrados y alineados)
         boton_ancho = 140
         boton_alto = 50
-        boton_x = ANCHO // 2 - boton_ancho // 2
+        espacio_entre = 30  # Espacio entre los botones
+        total_ancho_botones = boton_ancho * 2 + espacio_entre
+        boton_x1 = ANCHO // 2 - total_ancho_botones // 2
+        boton_x2 = boton_x1 + boton_ancho + espacio_entre
         boton_y = y_ficha + 200
 
-        self.boton_jugar = pygame.Rect(boton_x, boton_y, boton_ancho, boton_alto)
+        self.boton_jugar = pygame.Rect(boton_x1, boton_y, boton_ancho, boton_alto)
+        self.boton_jugar2 = pygame.Rect(boton_x2, boton_y, boton_ancho, boton_alto)
+
         pygame.draw.rect(VENTANA, DORADO, self.boton_jugar, border_radius=12)
-        texto_boton = fuente.render("1 Jugador", True, NEGRO)
-        ventana.blit(texto_boton, (
-            self.boton_jugar.centerx - texto_boton.get_width() // 2,
-            self.boton_jugar.centery - texto_boton.get_height() // 2
+        pygame.draw.rect(VENTANA, DORADO, self.boton_jugar2, border_radius=12)
+
+        texto_boton1 = fuente.render("1 Jugador", True, NEGRO)
+        texto_boton2 = fuente.render("2 Jugadores", True, NEGRO)
+
+        ventana.blit(texto_boton1, (
+            self.boton_jugar.centerx - texto_boton1.get_width() // 2,
+            self.boton_jugar.centery - texto_boton1.get_height() // 2
+        ))
+        ventana.blit(texto_boton2, (
+            self.boton_jugar2.centerx - texto_boton2.get_width() // 2,
+            self.boton_jugar2.centery - texto_boton2.get_height() // 2
         ))

@@ -2,7 +2,7 @@ import pygame
 import pyodbc
 import matplotlib.pyplot as plt
 import csv
-from config import VENTANA, ANCHO, fuente, pequena, BLANCO
+from config import VENTANA, ANCHO, fuente, pequena, BLANCO,ALTO
 import os
 
 rojos = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
@@ -164,16 +164,30 @@ class PantallaEstadisticas:
         total_txt = fuente.render(f"Total de giros: {self.total}", True, BLANCO)
         ventana.blit(total_txt, (80, 520))
 
-        # Botón Volver
-        self.boton_volver = pygame.Rect(ANCHO // 2 - 60, 570, 120, 35)
-        pygame.draw.rect(ventana, (180, 180, 0), self.boton_volver)
+         # Botones pequeños y alineados abajo a la derecha
+        boton_ancho = 90
+        boton_alto = 30
+        espacio_botones = 12
+        margen_derecho = 30
+        margen_inferior = 20
+
+        self.boton_exportar = pygame.Rect(
+            ANCHO - boton_ancho - margen_derecho,
+            ALTO - boton_alto - margen_inferior,
+            boton_ancho, boton_alto
+        )
+        self.boton_volver = pygame.Rect(
+            ANCHO - 2 * boton_ancho - espacio_botones - margen_derecho,
+            ALTO - boton_alto - margen_inferior,
+            boton_ancho, boton_alto
+        )
+
+        pygame.draw.rect(ventana, (180, 180, 0), self.boton_volver, border_radius=8)
         texto_btn = fuente.render("Volver", True, (0, 0, 0))
         ventana.blit(texto_btn, (self.boton_volver.centerx - texto_btn.get_width() // 2,
-                                 self.boton_volver.centery - 12))
+                                 self.boton_volver.centery - texto_btn.get_height() // 2))
 
-        # Botón Exportar CSV
-        self.boton_exportar = pygame.Rect(ANCHO // 2 + 80, 570, 160, 35)
-        pygame.draw.rect(ventana, (100, 200, 100), self.boton_exportar)
-        texto_exp = fuente.render("Exportar CSV", True, (0, 0, 0))
+        pygame.draw.rect(ventana, (100, 200, 100), self.boton_exportar, border_radius=8)
+        texto_exp = fuente.render("CSV", True, (0, 0, 0))
         ventana.blit(texto_exp, (self.boton_exportar.centerx - texto_exp.get_width() // 2,
-                                 self.boton_exportar.centery - 12))
+                                 self.boton_exportar.centery - texto_exp.get_height() // 2))

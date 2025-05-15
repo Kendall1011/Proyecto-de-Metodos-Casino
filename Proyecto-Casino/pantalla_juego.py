@@ -120,7 +120,6 @@ class PantallaJuego:
         pygame.draw.rect(VENTANA, (50, 120, 200), self.boton_repetir)
         ventana.blit(pequena.render("Repetir", True, BLANCO), (self.boton_repetir.centerx - 25, self.boton_repetir.centery - 7))
 
-        # Botón ESTADÍSTICAS
        # Botón ESTADÍSTICAS (pequeño, esquina superior derecha)
         self.boton_estadisticas = pygame.Rect(ANCHO - 140, 10, 120, 30)
         pygame.draw.rect(VENTANA, (50, 150, 255), self.boton_estadisticas)
