@@ -12,6 +12,8 @@ class PantallaInicio:
             x, y = pygame.mouse.get_pos()
             if self.boton_jugar.collidepoint(x, y):
                 self.cambiar_pantalla("juego")
+            elif self.boton_jugar2.collidepoint(x, y):
+                self.cambiar_pantalla("juego2")
 
     def actualizar(self):
         pass
@@ -61,7 +63,6 @@ class PantallaInicio:
         ventana.blit(linea3, (ANCHO // 2 - linea3.get_width() // 2, y_ficha + 120))
         ventana.blit(linea4, (ANCHO // 2 - linea4.get_width() // 2, y_ficha + 150))
 
-        # Botón de inicio (centrado)
          # Botones de inicio (centrados y alineados)
         boton_ancho = 140
         boton_alto = 50

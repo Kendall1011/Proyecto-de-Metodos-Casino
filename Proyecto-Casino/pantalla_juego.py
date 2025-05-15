@@ -14,6 +14,9 @@ class PantallaJuego:
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
 
+            # Botón casa (volver a inicio)
+            if self.boton_casa.collidepoint(x, y):
+                self.cambiar_pantalla("inicio")
             # Selección de fichas
             for i in range(len(fichas)):
                 fx = ANCHO // 2 - (len(fichas) * 40) // 2 + i * 50
@@ -104,25 +107,50 @@ class PantallaJuego:
             )
             ventana.blit(texto_msg, (ANCHO//2 - texto_msg.get_width()//2, 320))
 
-        # Botón GIRAR
+         # Tamaño y estilo unificado para todos los botones pequeños
+        boton_w = 100
+        boton_h = 35
+        radio = 8
+
+        # Botón ELIMINAR
+        self.boton_borrar = pygame.Rect(30, 620, boton_w, boton_h)
+        pygame.draw.rect(VENTANA, (180, 50, 50), self.boton_borrar, border_radius=radio)
+        ventana.blit(pequena.render("Eliminar", True, BLANCO), (
+            self.boton_borrar.centerx - pequena.size("Eliminar")[0] // 2,
+            self.boton_borrar.centery - pequena.size("Eliminar")[1] // 2
+        ))
+
+        # Botón REPETIR
+        self.boton_repetir = pygame.Rect(770, 620, boton_w, boton_h)
+        pygame.draw.rect(VENTANA, (50, 120, 200), self.boton_repetir, border_radius=radio)
+        ventana.blit(pequena.render("Repetir", True, BLANCO), (
+            self.boton_repetir.centerx - pequena.size("Repetir")[0] // 2,
+            self.boton_repetir.centery - pequena.size("Repetir")[1] // 2
+        ))
+
+        # Botón ESTADÍSTICAS (esquina superior derecha)
+        self.boton_estadisticas = pygame.Rect(ANCHO - 110, 10, boton_w, boton_h)
+        pygame.draw.rect(VENTANA, (50, 150, 255), self.boton_estadisticas, border_radius=radio)
+        texto_est = pequena.render("Estadísticas", True, (0, 0, 0))
+        VENTANA.blit(texto_est, (
+            self.boton_estadisticas.centerx - texto_est.get_width() // 2,
+            self.boton_estadisticas.centery - texto_est.get_height() // 2
+        ))
+
+        # Botón CASA (esquina superior izquierda)
+        self.boton_casa = pygame.Rect(10, 10, boton_w, boton_h)
+        pygame.draw.rect(VENTANA, (255, 230, 100), self.boton_casa, border_radius=radio)
+        texto_casa = pequena.render("Volver", True, (0, 0, 0))
+        VENTANA.blit(texto_casa, (
+            self.boton_casa.centerx - texto_casa.get_width() // 2,
+            self.boton_casa.centery - texto_casa.get_height() // 2
+        ))
+
+        # Botón GIRAR (se mantiene igual)
         self.boton_girar = pygame.Rect(ANCHO // 2 - 60, 620, 120, 35)
         pygame.draw.rect(VENTANA, DORADO, self.boton_girar)
         texto_girar = fuente.render("GIRAR", True, NEGRO)
-        ventana.blit(texto_girar, (self.boton_girar.centerx - texto_girar.get_width() // 2, self.boton_girar.centery - 12))
-
-        # Botón ELIMINAR
-        self.boton_borrar = pygame.Rect(30, 620, 100, 30)
-        pygame.draw.rect(VENTANA, (180, 50, 50), self.boton_borrar)
-        ventana.blit(pequena.render("Eliminar", True, BLANCO), (self.boton_borrar.centerx - 25, self.boton_borrar.centery - 7))
-
-        # Botón REPETIR
-        self.boton_repetir = pygame.Rect(770, 620, 100, 30)
-        pygame.draw.rect(VENTANA, (50, 120, 200), self.boton_repetir)
-        ventana.blit(pequena.render("Repetir", True, BLANCO), (self.boton_repetir.centerx - 25, self.boton_repetir.centery - 7))
-
-       # Botón ESTADÍSTICAS (pequeño, esquina superior derecha)
-        self.boton_estadisticas = pygame.Rect(ANCHO - 140, 10, 120, 30)
-        pygame.draw.rect(VENTANA, (50, 150, 255), self.boton_estadisticas)
-        texto_est = pequena.render("Estadísticas", True, (0, 0, 0))
-        VENTANA.blit(texto_est, (self.boton_estadisticas.centerx - texto_est.get_width() // 2,
-                         self.boton_estadisticas.centery - 8))
+        ventana.blit(texto_girar, (
+            self.boton_girar.centerx - texto_girar.get_width() // 2,
+            self.boton_girar.centery - texto_girar.get_height() // 2
+        ))

@@ -70,8 +70,15 @@ def dibujar_tablero():
         color = ROJO if texto == "ROJO" else NEGRO if texto == "NEGRO" else GRIS
         pygame.draw.rect(VENTANA, color, rect)
         pygame.draw.rect(VENTANA, BLANCO, rect, 2)
-        t = pequena.render(texto, True, BLANCO)
-        VENTANA.blit(t, (rect.centerx - t.get_width() // 2, rect.centery - t.get_height() // 2))
+        if texto == "ROJO":
+            # Dibuja un círculo rojo en vez de texto
+            pygame.draw.circle(VENTANA, ROJO, rect.center, 10)
+        elif texto == "NEGRO":
+            # Dibuja un círculo negro en vez de texto
+            pygame.draw.circle(VENTANA, NEGRO, rect.center, 10)
+        else:
+            t = pequena.render(texto, True, BLANCO)
+            VENTANA.blit(t, (rect.centerx - t.get_width() // 2, rect.centery - t.get_height() // 2))
         EstadoJuego.casillas_extra.append((texto, rect))
 
 def dibujar_fichas():
