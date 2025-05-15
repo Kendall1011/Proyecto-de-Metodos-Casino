@@ -14,6 +14,8 @@ class PantallaEstadisticas:
         self.frecuencias = [0] * 37
         self.total = 0
         self.colores_contador = {"rojo": 0, "negro": 0, "verde": 0}
+        self.scroll_offset = 0
+        self.max_scroll = 0
         self.generar_datos()
         self.generar_graficos()
 
@@ -113,6 +115,14 @@ class PantallaEstadisticas:
                 self.volver_callback()
             elif self.boton_exportar.collidepoint(x, y):
                 self.exportar_csv()
+        elif evento.type == pygame.KEYDOWN:
+            if evento.key == pygame.K_DOWN:
+                if self.scroll_offset < self.max_scroll:
+                    self.scroll_offset += 1
+            elif evento.key == pygame.K_UP:
+                if self.scroll_offset > 0:
+                    self.scroll_offset -= 1
+
 
     def actualizar(self):
         pass
@@ -149,17 +159,25 @@ class PantallaEstadisticas:
         ventana.blit(fuente.render("Color", True, BLANCO), (x_col4, y_base))
         y_base += 30
 
-        for i in range(37):
-            if self.frecuencias[i] > 0:
-                porcentaje = (self.frecuencias[i] / self.total) * 100
-                color = "verde" if i == 0 else "rojo" if i in rojos else "negro"
-
-                ventana.blit(pequena.render(str(i), True, BLANCO), (x_col1, y_base))
-                ventana.blit(pequena.render(str(self.frecuencias[i]), True, BLANCO), (x_col2, y_base))
-                ventana.blit(pequena.render(f"{porcentaje:.1f}%", True, BLANCO), (x_col3, y_base))
-                ventana.blit(pequena.render(color, True, BLANCO), (x_col4, y_base))
-                y_base += 22
-
+        filas = [(i, self.frecuencias[i]) for i in range(37) if self.frecuencias[i] > 0]
+        filas_visibles = 12
+        self.max_scroll = max(0, len(filas) - filas_visibles)
+        for idx in range(self.scroll_offset, min(self.scroll_offset + filas_visibles, len(filas))):
+            i, freq = filas[idx]
+            porcentaje = (freq / self.total) * 100
+            color = "verde" if i == 0 else "rojo" if i in rojos else "negro"
+            ventana.blit(pequena.render(str(i), True, BLANCO), (x_col1, y_base))
+            ventana.blit(pequena.render(str(freq), True, BLANCO), (x_col2, y_base))
+            ventana.blit(pequena.render(f"{porcentaje:.1f}%", True, BLANCO), (x_col3, y_base))
+            ventana.blit(pequena.render(color, True, BLANCO), (x_col4, y_base))
+            y_base += 22
+        
+        # Indicador de scroll
+        if self.max_scroll > 0:
+            scroll_text = pequena.render(f"▲▼ ({self.scroll_offset+1}-{min(self.scroll_offset+filas_visibles, len(filas))}/{len(filas)})", True, BLANCO)
+            ventana.blit(scroll_text, (x_col4 + 60, 260))
+        
+        
         # Total de giros
         total_txt = fuente.render(f"Total de giros: {self.total}", True, BLANCO)
         ventana.blit(total_txt, (80, 520))
