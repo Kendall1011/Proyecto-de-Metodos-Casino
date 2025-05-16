@@ -17,10 +17,12 @@ class EstadoJuego:
     ficha_seleccionada = None
     apuestas = []
     apuesta_anterior = []
+      
+    casillas = []           # ← requerido para el tablero
+    casillas_extra = [] 
     mensaje_resultado = ""
     resultado_guardado = False
-
-
+   
     # Tablero
     casillas = []
     casillas_extra = []
@@ -29,3 +31,6 @@ class EstadoJuego:
         [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35],
         [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34]
     ]
+# Dinero inicial
+dinero_j1 = 100000
+dinero_j2 = 100000
