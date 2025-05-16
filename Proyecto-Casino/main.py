@@ -8,6 +8,7 @@ from pantalla_juego2 import Pantalla_juego2
 
 
 
+
 # Variable global para la pantalla actual
 pantalla_actual = None
 

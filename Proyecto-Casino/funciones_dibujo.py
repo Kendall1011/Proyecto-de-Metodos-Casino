@@ -138,3 +138,36 @@ def dibujar_apuestas_color(apuestas):
                 cx = x + w // 2
                 cy = y + h // 2
                 pygame.draw.circle(VENTANA, color, (cx, cy), 10)
+def dibujar_billete(x, y, monto, ventana, escala=1.0):
+    # Escalar tamaño
+    ancho = int(120 * escala)
+    alto = int(50 * escala)
+    radio = int(10 * escala)
+
+    # Colores
+    fondo = (200, 255, 150)
+    borde = (0, 100, 0)
+    simbolo = (0, 100, 0)
+
+    # Cuerpo del billete
+    pygame.draw.rect(ventana, fondo, (x, y, ancho, alto), border_radius=10)
+    pygame.draw.rect(ventana, borde, (x, y, ancho, alto), 3, border_radius=10)
+
+    # Círculos de los bordes (decorativos)
+    pygame.draw.circle(ventana, borde, (x + radio, y + radio), radio, 2)
+    pygame.draw.circle(ventana, borde, (x + ancho - radio, y + radio), radio, 2)
+    pygame.draw.circle(ventana, borde, (x + radio, y + alto - radio), radio, 2)
+    pygame.draw.circle(ventana, borde, (x + ancho - radio, y + alto - radio), radio, 2)
+
+    # Círculo central con símbolo $
+    pygame.draw.circle(ventana, borde, (x + ancho // 2, y + alto // 2), int(15 * escala), 0)
+    font_simbolo = pygame.font.SysFont("arial", int(18 * escala), bold=True)
+    texto_simbolo = font_simbolo.render("$", True, fondo)
+    ventana.blit(texto_simbolo, (
+        x + ancho // 2 - texto_simbolo.get_width() // 2,
+        y + alto // 2 - texto_simbolo.get_height() // 2
+    ))
+
+    # Mostrar monto
+    texto_monto = pygame.font.SysFont("arial", int(14 * escala), bold=True).render(f"₡{monto:,}", True, borde)
+    ventana.blit(texto_monto, (x + 5, y - int(18 * escala)))
