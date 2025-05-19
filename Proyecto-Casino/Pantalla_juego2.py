@@ -9,17 +9,6 @@ from funciones_dibujo import (
     dibujar_apuestas_color, obtener_numero, dibujar_ficha_estilo_casino
 )
 
-import pygame
-import random
-from config import VENTANA, ANCHO, fuente, pequena, BLANCO, DORADO, NEGRO
-from estado_juego import EstadoJuego, dinero_j1, dinero_j2
-from datos_juego import rojos, negros
-from bd import guardar_resultado
-from funciones_dibujo import (
-    dibujar_ruleta, dibujar_bolita, dibujar_tablero,
-    dibujar_apuestas_color, obtener_numero, dibujar_ficha_estilo_casino
-)
-
 def valor_ficha(valor):
     valores = {
         "50": 50, "500": 500, "2.5K": 2500, "10K": 10000,
@@ -41,6 +30,9 @@ class Pantalla_juego2:
         self.resultado_final = None
         self.ganador = ""
         self.ficha_seleccionada = None
+        self.flash_j1 = None
+        self.flash_j2 = None
+        self.flash_tiempo = 0
 
         self.fichas_j1 = [
             ("gold", "50"), ("saddlebrown", "500"), ("pink", "2.5K"), ("skyblue", "10K"),
@@ -59,7 +51,7 @@ class Pantalla_juego2:
 
             if self.boton_casa.collidepoint(x, y):
                 self.cambiar_pantalla("inicio")
-            if self.boton_estadisticas.collidepoint(x, y):
+            elif self.boton_estadisticas.collidepoint(x, y):
                 self.cambiar_pantalla("estadisticas")
 
             columnas = 4
@@ -100,12 +92,15 @@ class Pantalla_juego2:
 
             if self.boton_borrar.collidepoint(x, y):
                 if self.turno == 1:
-                    for _, _, valor in self.apuestas_j1: dinero_j1 += valor
+                    for _, _, valor in self.apuestas_j1:
+                        dinero_j1 += valor
                     self.apuestas_j1.clear()
                 else:
-                    for _, _, valor in self.apuestas_j2: dinero_j2 += valor
+                    for _, _, valor in self.apuestas_j2:
+                        dinero_j2 += valor
                     self.apuestas_j2.clear()
                 self.ficha_seleccionada = None
+
 
 
 
@@ -153,6 +148,18 @@ class Pantalla_juego2:
                     else:
                         self.ganador = "Ninguno"
 
+                    if j1_total > 0:
+                        self.flash_j1 = "verde"
+                    elif self.apuestas_j1:
+                        self.flash_j1 = "rojo"
+
+                    if j2_total > 0:
+                        self.flash_j2 = "verde"
+                    elif self.apuestas_j2:
+                        self.flash_j2 = "rojo"
+
+                    self.flash_tiempo = pygame.time.get_ticks()
+
                     self.apuestas_j1.clear()
                     self.apuestas_j2.clear()
 
@@ -166,20 +173,29 @@ class Pantalla_juego2:
         EstadoJuego.apuestas.extend((a, c) for a, c, _ in self.apuestas_j1 + self.apuestas_j2)
         dibujar_apuestas_color(EstadoJuego.apuestas)
 
-# Jugador 1 - Billete más realista
-        # ----- Jugador 1 -----
         billete_x1 = 45
         billete_y = 475
         billete_w = 65
         billete_h = 28
         centro_x1 = billete_x1 + billete_w // 2
+        billete_x2 = ANCHO - 110
+        centro_x2 = billete_x2 + billete_w // 2
 
-# Texto encima centrado
+        color_flash_j1 = (192, 255, 140)
+        color_flash_j2 = (192, 255, 140)
+        if self.flash_j1 and pygame.time.get_ticks() - self.flash_tiempo < 300:
+            color_flash_j1 = (0, 255, 0) if self.flash_j1 == "verde" else (255, 60, 60)
+        else:
+            self.flash_j1 = None
+
+        if self.flash_j2 and pygame.time.get_ticks() - self.flash_tiempo < 300:
+            color_flash_j2 = (0, 255, 0) if self.flash_j2 == "verde" else (255, 60, 60)
+        else:
+            self.flash_j2 = None
+
         texto_j1 = pequena.render(f"Jugador 1 = {dinero_j1:,}", True, BLANCO)
         ventana.blit(texto_j1, texto_j1.get_rect(center=(centro_x1, billete_y - 12)))
-
-# Billete visual
-        pygame.draw.rect(ventana, (192, 255, 140), (billete_x1, billete_y, billete_w, billete_h), border_radius=4)
+        pygame.draw.rect(ventana, color_flash_j1, (billete_x1, billete_y, billete_w, billete_h), border_radius=4)
         pygame.draw.circle(ventana, (60, 160, 60), (billete_x1 + 10, billete_y + billete_h // 2), 3)
         pygame.draw.circle(ventana, (60, 160, 60), (billete_x1 + billete_w - 10, billete_y + billete_h // 2), 3)
         pygame.draw.circle(ventana, (60, 160, 60), (centro_x1, billete_y + billete_h // 2), 6)
@@ -187,22 +203,15 @@ class Pantalla_juego2:
         simbolo_rect = simbolo.get_rect(center=(centro_x1, billete_y + billete_h // 2))
         ventana.blit(simbolo, simbolo_rect)
 
-
-# ----- Jugador 2 -----
-        billete_x2 = ANCHO - 110
-        centro_x2 = billete_x2 + billete_w // 2
-
         texto_j2 = pequena.render(f"Jugador 2 = {dinero_j2:,}", True, BLANCO)
         ventana.blit(texto_j2, texto_j2.get_rect(center=(centro_x2, billete_y - 12)))
-
-        pygame.draw.rect(ventana, (192, 255, 140), (billete_x2, billete_y, billete_w, billete_h), border_radius=4)
+        pygame.draw.rect(ventana, color_flash_j2, (billete_x2, billete_y, billete_w, billete_h), border_radius=4)
         pygame.draw.circle(ventana, (60, 160, 60), (billete_x2 + 10, billete_y + billete_h // 2), 3)
         pygame.draw.circle(ventana, (60, 160, 60), (billete_x2 + billete_w - 10, billete_y + billete_h // 2), 3)
         pygame.draw.circle(ventana, (60, 160, 60), (centro_x2, billete_y + billete_h // 2), 6)
         simbolo2 = pequena.render("$", True, BLANCO)
         simbolo_rect2 = simbolo2.get_rect(center=(centro_x2, billete_y + billete_h // 2))
         ventana.blit(simbolo2, simbolo_rect2)
-
 
 
         if self.resultado_final is not None:
