@@ -166,19 +166,44 @@ class Pantalla_juego2:
         EstadoJuego.apuestas.extend((a, c) for a, c, _ in self.apuestas_j1 + self.apuestas_j2)
         dibujar_apuestas_color(EstadoJuego.apuestas)
 
-        pygame.draw.rect(ventana, (192, 255, 140), (30, 460, 120, 25), border_radius=6)
-        pygame.draw.circle(ventana, (60, 160, 60), (45, 472), 6)
-        pygame.draw.circle(ventana, (60, 160, 60), (135, 472), 6)
-        pygame.draw.circle(ventana, (60, 160, 60), (90, 472), 12)
-        ventana.blit(pequena.render("$", True, BLANCO), (87, 463))
-        ventana.blit(pequena.render(f"Jugador 1 = ₡{dinero_j1:,}", True, BLANCO), (30, 440))
+# Jugador 1 - Billete más realista
+        # ----- Jugador 1 -----
+        billete_x1 = 45
+        billete_y = 475
+        billete_w = 65
+        billete_h = 28
+        centro_x1 = billete_x1 + billete_w // 2
 
-        pygame.draw.rect(ventana, (192, 255, 140), (ANCHO - 150, 460, 120, 25), border_radius=6)
-        pygame.draw.circle(ventana, (60, 160, 60), (ANCHO - 135, 472), 6)
-        pygame.draw.circle(ventana, (60, 160, 60), (ANCHO - 45, 472), 6)
-        pygame.draw.circle(ventana, (60, 160, 60), (ANCHO - 90, 472), 12)
-        ventana.blit(pequena.render("$", True, BLANCO), (ANCHO - 93, 463))
-        ventana.blit(pequena.render(f"Jugador 2 = ₡{dinero_j2:,}", True, BLANCO), (ANCHO - 150, 440))
+# Texto encima centrado
+        texto_j1 = pequena.render(f"Jugador 1 = {dinero_j1:,}", True, BLANCO)
+        ventana.blit(texto_j1, texto_j1.get_rect(center=(centro_x1, billete_y - 12)))
+
+# Billete visual
+        pygame.draw.rect(ventana, (192, 255, 140), (billete_x1, billete_y, billete_w, billete_h), border_radius=4)
+        pygame.draw.circle(ventana, (60, 160, 60), (billete_x1 + 10, billete_y + billete_h // 2), 3)
+        pygame.draw.circle(ventana, (60, 160, 60), (billete_x1 + billete_w - 10, billete_y + billete_h // 2), 3)
+        pygame.draw.circle(ventana, (60, 160, 60), (centro_x1, billete_y + billete_h // 2), 6)
+        simbolo = pequena.render("$", True, BLANCO)
+        simbolo_rect = simbolo.get_rect(center=(centro_x1, billete_y + billete_h // 2))
+        ventana.blit(simbolo, simbolo_rect)
+
+
+# ----- Jugador 2 -----
+        billete_x2 = ANCHO - 110
+        centro_x2 = billete_x2 + billete_w // 2
+
+        texto_j2 = pequena.render(f"Jugador 2 = {dinero_j2:,}", True, BLANCO)
+        ventana.blit(texto_j2, texto_j2.get_rect(center=(centro_x2, billete_y - 12)))
+
+        pygame.draw.rect(ventana, (192, 255, 140), (billete_x2, billete_y, billete_w, billete_h), border_radius=4)
+        pygame.draw.circle(ventana, (60, 160, 60), (billete_x2 + 10, billete_y + billete_h // 2), 3)
+        pygame.draw.circle(ventana, (60, 160, 60), (billete_x2 + billete_w - 10, billete_y + billete_h // 2), 3)
+        pygame.draw.circle(ventana, (60, 160, 60), (centro_x2, billete_y + billete_h // 2), 6)
+        simbolo2 = pequena.render("$", True, BLANCO)
+        simbolo_rect2 = simbolo2.get_rect(center=(centro_x2, billete_y + billete_h // 2))
+        ventana.blit(simbolo2, simbolo_rect2)
+
+
 
         if self.resultado_final is not None:
             texto = fuente.render(f"Número: {self.resultado_final}", True, BLANCO)
