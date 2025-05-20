@@ -2,7 +2,7 @@ import pygame
 import pyodbc
 import matplotlib.pyplot as plt
 import csv
-from config import VENTANA, ANCHO, fuente, pequena, BLANCO,ALTO
+from config import VENTANA, ANCHO, fuente, pequena, BLANCO,ALTO,NEGRO
 import os
 
 rojos = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
@@ -56,13 +56,10 @@ class PantallaEstadisticas:
                     cantidades.append(self.frecuencias[i])
                     colores_barras.append("green" if i == 0 else "red" if i in rojos else "black")
 
-            plt.figure(figsize=(8.5, 3.5), dpi=200)
+            plt.figure(figsize=(9, 4), dpi=200)
             plt.bar(numeros, cantidades, color=colores_barras)
             plt.xticks(numeros, fontsize=9)
             plt.yticks(fontsize=9)
-            plt.title("Frecuencia por Número", fontsize=13)
-            plt.xlabel("Número", fontsize=10)
-            plt.ylabel("Frecuencia", fontsize=10)
             plt.tight_layout()
             plt.savefig("grafico_barras.png")
             plt.close()
@@ -128,7 +125,7 @@ class PantallaEstadisticas:
         pass
 
     def dibujar(self, ventana):
-        ventana.fill((25, 25, 25))
+        ventana.fill(BLANCO)
 
         # Título
         titulo = fuente.render("Estadísticas de Giros", True, BLANCO)
@@ -153,10 +150,10 @@ class PantallaEstadisticas:
         x_col3 = x_col2 + 70
         x_col4 = x_col3 + 80
 
-        ventana.blit(fuente.render("Num", True, BLANCO), (x_col1, y_base))
-        ventana.blit(fuente.render("Freq", True, BLANCO), (x_col2, y_base))
-        ventana.blit(fuente.render("%", True, BLANCO), (x_col3 + 5, y_base))
-        ventana.blit(fuente.render("Color", True, BLANCO), (x_col4, y_base))
+        ventana.blit(fuente.render("Num", True, NEGRO ), (x_col1, y_base))
+        ventana.blit(fuente.render("Freq", True, NEGRO), (x_col2, y_base))
+        ventana.blit(fuente.render("%", True, NEGRO), (x_col3 + 5, y_base))
+        ventana.blit(fuente.render("Color", True, NEGRO), (x_col4, y_base))
         y_base += 30
 
         filas = [(i, self.frecuencias[i]) for i in range(37) if self.frecuencias[i] > 0]
@@ -166,20 +163,20 @@ class PantallaEstadisticas:
             i, freq = filas[idx]
             porcentaje = (freq / self.total) * 100
             color = "verde" if i == 0 else "rojo" if i in rojos else "negro"
-            ventana.blit(pequena.render(str(i), True, BLANCO), (x_col1, y_base))
-            ventana.blit(pequena.render(str(freq), True, BLANCO), (x_col2, y_base))
-            ventana.blit(pequena.render(f"{porcentaje:.1f}%", True, BLANCO), (x_col3, y_base))
-            ventana.blit(pequena.render(color, True, BLANCO), (x_col4, y_base))
+            ventana.blit(pequena.render(str(i), True, NEGRO), (x_col1, y_base))
+            ventana.blit(pequena.render(str(freq), True, NEGRO), (x_col2, y_base))
+            ventana.blit(pequena.render(f"{porcentaje:.1f}%", True, NEGRO), (x_col3, y_base))
+            ventana.blit(pequena.render(color, True, NEGRO), (x_col4, y_base))
             y_base += 22
         
         # Indicador de scroll
         if self.max_scroll > 0:
-            scroll_text = pequena.render(f"▲▼ ({self.scroll_offset+1}-{min(self.scroll_offset+filas_visibles, len(filas))}/{len(filas)})", True, BLANCO)
+            scroll_text = pequena.render(f"▲▼ ({self.scroll_offset+1}-{min(self.scroll_offset+filas_visibles, len(filas))}/{len(filas)})", True, NEGRO)
             ventana.blit(scroll_text, (x_col4 + 60, 260))
         
         
         # Total de giros
-        total_txt = fuente.render(f"Total de giros: {self.total}", True, BLANCO)
+        total_txt = fuente.render(f"Total de giros: {self.total}", True, NEGRO)
         ventana.blit(total_txt, (80, 520))
 
          # Botones pequeños y alineados abajo a la derecha
