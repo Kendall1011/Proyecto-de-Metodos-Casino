@@ -2,7 +2,7 @@ import pygame
 import math
 from funciones_dibujo import dibujar_ficha_estilo_casino, dibujar_ruleta_animada, dibujar_bolita_inicio
 from datos_juego import fichas
-from config import ANCHO, FONDO, NEGRO, BLANCO, ROJO, fuente, grande
+from config import ANCHO, FONDO, NEGRO, BLANCO, fuente, grande
 
 class PantallaInicio:
     def __init__(self, cambiar_pantalla):
@@ -20,58 +20,61 @@ class PantallaInicio:
 
     def actualizar(self):
         self.angulo = (self.angulo + 1) % 360
-        self.tiempo += 0.05
+        self.tiempo += 0.1
 
     def dibujar(self, ventana):
         ventana.fill(FONDO)
 
-        # 🎯 Ruleta y bolita animadas
+        # Ruleta + bolita
         centro_ruleta = (ANCHO // 2, 160)
         pygame.draw.circle(ventana, (255, 215, 0), centro_ruleta, 130)
         dibujar_ruleta_animada(ventana, centro_ruleta, 110, self.angulo)
         dibujar_bolita_inicio(ventana, centro_ruleta, 80, -self.angulo * 2)
 
-        # 🎯 Cartel visual "CASINO UCR"
+        # Cartel
         cartel_ancho = 600
         cartel_alto = 80
         cartel_x = ANCHO // 2 - cartel_ancho // 2
         cartel_y = 300
 
-        # Fondo y borde del cartel
         pygame.draw.rect(ventana, (10, 10, 60), (cartel_x, cartel_y, cartel_ancho, cartel_alto), border_radius=20)
         pygame.draw.rect(ventana, BLANCO, (cartel_x, cartel_y, cartel_ancho, cartel_alto), 4, border_radius=20)
 
-        # 💡 Puntos decorativos tipo luces con simetría perfecta (24 puntos, sin esquinas)
+        # Puntos con efecto intermitente
         num_puntos = 24
         espaciado = cartel_ancho // (num_puntos + 1)
         for i in range(1, num_puntos + 1):
             x = cartel_x + i * espaciado
-            for y in [cartel_y + 10, cartel_y + cartel_alto - 10]:
-                # Resplandor suave
-                glow = pygame.Surface((12, 12), pygame.SRCALPHA)
-                pygame.draw.circle(glow, (255, 255, 255, 80), (6, 6), 6)
-                ventana.blit(glow, (x - 6, y - 6))
-                pygame.draw.circle(ventana, BLANCO, (int(x), int(y)), 4)
+            pulso = math.sin(self.tiempo + i * 0.3)
+            intensidad = 200 + int(55 * pulso)
+            color_luz = (intensidad, intensidad * 0.8, 100)  # tono cálido
 
-        # ✨ Texto con resplandor animado
-        intensidad = 180 + int(75 * math.sin(self.tiempo))
-        color_resplandor = (intensidad, intensidad, 0)
-        texto = grande.render("CASINO UCR", True, color_resplandor)
+            for y in [cartel_y + 10, cartel_y + cartel_alto - 10]:
+                glow = pygame.Surface((12, 12), pygame.SRCALPHA)
+                pygame.draw.circle(glow, (255, 255, 255, 40), (6, 6), 6)
+                ventana.blit(glow, (x - 6, y - 6))
+                pygame.draw.circle(ventana, color_luz, (x, y), 4)
+
+        # Texto central con resplandor
+        brillo = 180 + int(75 * math.sin(self.tiempo))
+        color_texto = (brillo, brillo, 0)
+        texto = grande.render("CASINO UCR", True, color_texto)
         ventana.blit(texto, (
             cartel_x + cartel_ancho // 2 - texto.get_width() // 2,
             cartel_y + cartel_alto // 2 - texto.get_height() // 2
         ))
 
-        # 🎲 Fichas decorativas
+        # Fichas decorativas
         y_ficha = cartel_y + cartel_alto + 30
-        espacio_fichas = 50
-        total_ancho_fichas = len(fichas) * espacio_fichas
-        start_x = ANCHO // 2 - total_ancho_fichas // 2
+        espacio = 50
+        total_ancho = len(fichas) * espacio
+        start_x = ANCHO // 2 - total_ancho // 2
+
         for i, (color, valor) in enumerate(fichas):
-            x = start_x + i * espacio_fichas
+            x = start_x + i * espacio
             dibujar_ficha_estilo_casino(x, y_ficha, color, valor)
 
-        # 📄 Créditos del proyecto
+        # Créditos
         textos = [
             "Proyecto Métodos Cuantitativos 2025",
             "- Kendall León",
@@ -82,7 +85,7 @@ class PantallaInicio:
             render = fuente.render(txt, True, BLANCO)
             ventana.blit(render, (ANCHO // 2 - render.get_width() // 2, y_ficha + 70 + i * 30))
 
-        # 🎮 Botones
+        # Botones
         boton_ancho = 140
         boton_alto = 50
         espacio_entre = 30
