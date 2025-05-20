@@ -103,6 +103,7 @@ def dibujar_fichas():
         x = start_x + i * 50
         seleccionada = (EstadoJuego.ficha_seleccionada == i)
         dibujar_ficha_estilo_casino(x, y, color, valor, seleccionada)
+        
 def dibujar_ficha_estilo_casino(x, y, color, valor, seleccionada=False):
     radio = 22
 

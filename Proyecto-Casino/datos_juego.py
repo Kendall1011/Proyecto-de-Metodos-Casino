@@ -14,7 +14,7 @@ colores = [VERDE if n == 0 else (ROJO if n in rojos else NEGRO) for n in numeros
 
 # Fichas y sus valores
 fichas = [
-    ((255, 215, 0), "50"),
+    ("darkgoldenrod", "50"),
     ((210, 105, 30), "500"),
     ((220, 20, 60), "2.5K"),
     ((70, 130, 180), "10K"),

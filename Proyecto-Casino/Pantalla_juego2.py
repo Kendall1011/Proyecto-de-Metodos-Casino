@@ -35,7 +35,7 @@ class Pantalla_juego2:
         self.flash_tiempo = 0
 
         self.fichas_j1 = [
-            ("gold", "50"), ("saddlebrown", "500"), ("pink", "2.5K"), ("skyblue", "10K"),
+            ("darkgoldenrod", "50"), ("saddlebrown", "500"), ("pink", "2.5K"), ("skyblue", "10K"),
             ("orange", "25K"), ("gray", "50K"), ("violet", "100K"), ("purple", "250K")
         ]
         self.fichas_j2 = [
