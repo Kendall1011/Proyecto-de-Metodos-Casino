@@ -34,10 +34,10 @@ Este es un proyecto desarrollado como parte del curso **Métodos Cuantitativos 2
 ## 📁 Estructura del proyecto
 Proyecto-de-Metodos-Casino/
 │
-├── config.py # Configuración global (colores, pantalla, fuentes)
-├── main.py # Archivo principal del juego
-├── funciones_dibujo.py # Funciones para dibujar fichas, tablero y ruleta
-├── pantalla_inicio.py # Pantalla inicial con selección de modo de juego
-├── pantalla_juego.py # Pantalla principal de juego (1 jugador)
+├── config.py # Configuración global (colores, pantalla, fuentes).
+├── main.py # Archivo principal del juego.
+├── funciones_dibujo.py # Funciones para dibujar fichas, tablero y ruleta.
+├── pantalla_inicio.py # Pantalla inicial con selección de modo de juego.
+├── pantalla_juego.py # Pantalla principal de juego (1 jugador).
 ├── datos_juego.py # Datos como fichas, números, colores, etc.
-└── README.md # Documentación del proyecto
+└── README.md # Documentación del proyecto.
