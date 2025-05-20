@@ -49,10 +49,6 @@ Proyecto-Casino/
 1. Instala Python 3.10 o superior.
 2. Instala las dependencias:
 
-```bash
-pip install pygame
-```
-
 3. Ejecuta el juego:
 
 ```bash
