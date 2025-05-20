@@ -4,6 +4,21 @@ from config import VENTANA, ANCHO, ROJO, NEGRO, VERDE, BLANCO, DORADO, MARRON_CL
 from datos_juego import numeros, colores, fichas, rojos
 from estado_juego import EstadoJuego
 
+# Lista de números reales de ruleta americana (o europea si prefieres)
+numeros_ruleta = [
+    0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27,
+    13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1,
+    20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+]
+
+colores_numeros = []
+for n in numeros_ruleta:
+    if n == 0:
+        colores_numeros.append(VERDE)
+    elif n in [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]:
+        colores_numeros.append(ROJO)
+    else:
+        colores_numeros.append(NEGRO)
 def obtener_numero(angulo_relativo):
     angulo = (angulo_relativo + 90) % 360
     sector = int(angulo / (360 / len(numeros)))
@@ -171,3 +186,41 @@ def dibujar_billete(x, y, monto, ventana, escala=1.0):
     # Mostrar monto
     texto_monto = pygame.font.SysFont("arial", int(14 * escala), bold=True).render(f"₡{monto:,}", True, borde)
     ventana.blit(texto_monto, (x + 5, y - int(18 * escala)))
+
+def dibujar_ruleta_animada(superficie, centro, radio, angulo):
+    sectores = len(numeros)
+    angulo_sector = 360 / sectores
+
+    # Borde exterior dorado
+    pygame.draw.circle(superficie, DORADO, centro, radio + 10)
+    pygame.draw.circle(superficie, NEGRO, centro, radio)
+
+    # Dibujar sectores
+    for i in range(sectores):
+        color = colores[i]
+        start_angle = math.radians(angulo - 90 + i * angulo_sector)
+        end_angle = math.radians(angulo - 90 + (i + 1) * angulo_sector)
+
+        x1 = centro[0] + math.cos(start_angle) * radio
+        y1 = centro[1] + math.sin(start_angle) * radio
+        x2 = centro[0] + math.cos(end_angle) * radio
+        y2 = centro[1] + math.sin(end_angle) * radio
+
+        pygame.draw.polygon(superficie, color, [centro, (x1, y1), (x2, y2)])
+        pygame.draw.line(superficie, BLANCO, centro, (x1, y1), 1)
+
+        # Dibujar número centrado en cada sector
+        ang_medio = math.radians(angulo - 90 + (i + 0.5) * angulo_sector)
+        xt = centro[0] + math.cos(ang_medio) * (radio - 20)
+        yt = centro[1] + math.sin(ang_medio) * (radio - 20)
+        texto = pequena.render(str(numeros[i]), True, BLANCO)
+        superficie.blit(texto, (xt - texto.get_width() // 2, yt - texto.get_height() // 2))
+
+    # Anillos internos decorativos
+    pygame.draw.circle(superficie, MARRON_CLARO, centro, int(radio * 0.35))
+    pygame.draw.circle(superficie, MADERA, centro, int(radio * 0.18))
+def dibujar_bolita_inicio(ventana, centro, radio, angulo):
+    import math
+    x = centro[0] + math.cos(math.radians(angulo)) * radio
+    y = centro[1] + math.sin(math.radians(angulo)) * radio
+    pygame.draw.circle(ventana, BLANCO, (int(x), int(y)), 8)
