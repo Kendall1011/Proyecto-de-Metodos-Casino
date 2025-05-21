@@ -43,6 +43,16 @@ class Pantalla_juego2:
             ("darkorange", "25K"), ("black", "50K"), ("indigo", "100K"), ("deeppink", "250K")
         ]
 
+        # Cargar el sonido de la ruleta
+        self.sonido_ruleta = pygame.mixer.Sound("sonidos/roulette-spin.mp3")
+        self.sonido_ruleta.set_volume(0.7)
+        self.sonido_ruleta_canal = None  # Para controlar el canal de reproducción
+
+        # Cargar el sonido de victoria
+        self.sonido_player_wins = pygame.mixer.Sound("sonidos/player-wins.mp3")
+        self.sonido_player_wins.set_volume(0.7)
+        self.sonido_player_wins_canal = None  # Para controlar el canal de reproducción
+
     def manejar_evento(self, evento):
         global dinero_j1, dinero_j2
 
@@ -90,6 +100,10 @@ class Pantalla_juego2:
                 self.ganador = ""
                 self.ficha_seleccionada = None
 
+                # Reproducir sonido de ruleta solo cuando empieza a girar
+                if self.sonido_ruleta_canal is None or not self.sonido_ruleta_canal.get_busy():
+                    self.sonido_ruleta_canal = self.sonido_ruleta.play()
+
             if self.boton_borrar.collidepoint(x, y):
                 if self.turno == 1:
                     for _, _, valor in self.apuestas_j1:
@@ -101,9 +115,6 @@ class Pantalla_juego2:
                     self.apuestas_j2.clear()
                 self.ficha_seleccionada = None
 
-
-
-
     def actualizar(self):
         global dinero_j1, dinero_j2
 
@@ -112,8 +123,16 @@ class Pantalla_juego2:
             EstadoJuego.bola_angulo -= EstadoJuego.velocidad * 1.5
             EstadoJuego.velocidad *= 0.98
 
+            # Si el sonido no está sonando, reprodúcelo (por si acaso)
+            if self.sonido_ruleta_canal is None or not self.sonido_ruleta_canal.get_busy():
+                self.sonido_ruleta_canal = self.sonido_ruleta.play()
+
             if EstadoJuego.velocidad < 0.1:
                 EstadoJuego.girando = False
+
+                # Detener el sonido cuando termina de girar
+                if self.sonido_ruleta_canal is not None:
+                    self.sonido_ruleta_canal.stop()
 
                 if not EstadoJuego.resultado_guardado:
                     self.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
@@ -141,10 +160,19 @@ class Pantalla_juego2:
 
                     if j1_total and not j2_total:
                         self.ganador = "Jugador 1"
+                        # Sonido de victoria para Jugador 1
+                        if self.sonido_player_wins_canal is None or not self.sonido_player_wins_canal.get_busy():
+                            self.sonido_player_wins_canal = self.sonido_player_wins.play()
                     elif j2_total and not j1_total:
                         self.ganador = "Jugador 2"
+                        # Sonido de victoria para Jugador 2
+                        if self.sonido_player_wins_canal is None or not self.sonido_player_wins_canal.get_busy():
+                            self.sonido_player_wins_canal = self.sonido_player_wins.play()
                     elif j1_total and j2_total:
                         self.ganador = "Empate"
+                        # Sonido de victoria para ambos
+                        if self.sonido_player_wins_canal is None or not self.sonido_player_wins_canal.get_busy():
+                            self.sonido_player_wins_canal = self.sonido_player_wins.play()
                     else:
                         self.ganador = "Ninguno"
 

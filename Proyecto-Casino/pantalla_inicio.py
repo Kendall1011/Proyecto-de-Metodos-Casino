@@ -79,7 +79,7 @@ class PantallaInicio:
             "Proyecto Métodos Cuantitativos 2025",
             "- Kendall León",
             "- Anderson Umaña",
-            "- Nombre 3"
+            "- Dylan Bastos"
         ]
         for i, txt in enumerate(textos):
             render = fuente.render(txt, True, BLANCO)

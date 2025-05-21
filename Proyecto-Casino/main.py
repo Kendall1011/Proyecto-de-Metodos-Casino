@@ -32,6 +32,12 @@ def main():
     cambiar_pantalla("inicio")
     reloj = pygame.time.Clock()
 
+    # Inicializar el mixer y reproducir música de fondo
+    pygame.mixer.init()
+    pygame.mixer.music.load("sonidos/casino-ambiance.mp3")
+    pygame.mixer.music.set_volume(0.5)  # Puedes ajustar el volumen (0.0 a 1.0)
+    pygame.mixer.music.play(-1)  # -1 para reproducir en bucle
+
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:

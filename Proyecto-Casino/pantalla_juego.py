@@ -21,6 +21,15 @@ class PantallaJuego:
         self.flash_tiempo = 0
 
 
+
+        self.sonido_player_wins = pygame.mixer.Sound("sonidos/player-wins.mp3")
+        self.sonido_player_wins.set_volume(0.7)
+        self.sonido_player_wins_canal = None  # Para controlar el canal de reproducción
+        # Cargar el sonido de la ruleta
+        self.sonido_ruleta = pygame.mixer.Sound("sonidos/roulette-spin.mp3")
+        self.sonido_ruleta.set_volume(0.7)
+        self.sonido_ruleta_canal = None  # Para controlar el canal de reproducción
+
     def manejar_evento(self, evento):
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
@@ -53,6 +62,10 @@ class PantallaJuego:
                 EstadoJuego.mensaje_resultado = ""
                 EstadoJuego.resultado_guardado = False
 
+                # Reproducir sonido de ruleta solo cuando empieza a girar
+                if self.sonido_ruleta_canal is None or not self.sonido_ruleta_canal.get_busy():
+                    self.sonido_ruleta_canal = self.sonido_ruleta.play()
+
             # Botón borrar
             elif self.boton_borrar.collidepoint(x, y):
                 EstadoJuego.apuestas.clear()
@@ -72,8 +85,16 @@ class PantallaJuego:
             EstadoJuego.bola_angulo -= EstadoJuego.velocidad * 1.5
             EstadoJuego.velocidad *= 0.98
 
+            # Si el sonido no está sonando, reprodúcelo (por si acaso)
+            if self.sonido_ruleta_canal is None or not self.sonido_ruleta_canal.get_busy():
+                self.sonido_ruleta_canal = self.sonido_ruleta.play()
+
             if EstadoJuego.velocidad < 0.1:
                 EstadoJuego.girando = False
+
+                # Detener el sonido cuando termina de girar
+                if self.sonido_ruleta_canal is not None:
+                    self.sonido_ruleta_canal.stop()
 
                 if not EstadoJuego.resultado_guardado:
                     EstadoJuego.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
@@ -101,6 +122,8 @@ class PantallaJuego:
                             (apuesta == "19-36" and 19 <= EstadoJuego.resultado_final <= 36)
                         ):
                             EstadoJuego.mensaje_resultado = "¡Ganaste!"
+                            if self.sonido_player_wins_canal is None or not self.sonido_player_wins_canal.get_busy():
+                                self.sonido_player_wins_canal = self.sonido_player_wins.play()
                             break
 
                     
