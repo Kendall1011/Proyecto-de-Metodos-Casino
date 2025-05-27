@@ -79,7 +79,7 @@ def dibujar_tablero():
             VENTANA.blit(texto, (x + 15, y + 7))
             EstadoJuego.casillas.append((num, rect))
 
-    etiquetas = ["1-18", "PAR", "ROJO", "NEGRO", "IMPAR", "19-36"]
+    etiquetas = ["1-18", "PAR", "ROJO", "NEGRO", "IMPAR", "19-36","1st 12", "2nd 12", "3rd 12"]
     for i, texto in enumerate(etiquetas):
         rect = pygame.Rect(x0 + ancho + i * ancho, y0 + alto * 3 + 5, ancho, alto)
         color = ROJO if texto == "ROJO" else NEGRO if texto == "NEGRO" else GRIS
