@@ -61,11 +61,13 @@ def dibujar_tablero():
     EstadoJuego.casillas.clear()
     EstadoJuego.casillas_extra.clear()
 
+    # Casilla 0 (verde)
     pygame.draw.rect(VENTANA, VERDE, (x0, y0, ancho, alto * 3))
     pygame.draw.rect(VENTANA, NEGRO, (x0, y0, ancho, alto * 3), 2)
     VENTANA.blit(pequena.render("0", True, BLANCO), (x0 + 15, y0 + 35))
     EstadoJuego.casillas.append((0, pygame.Rect(x0, y0, ancho, alto * 3)))
 
+    # Números (3 filas x 12 columnas)
     for fila in range(3):
         for col in range(12):
             num = EstadoJuego.numeros_tablero[fila][col]
@@ -79,23 +81,50 @@ def dibujar_tablero():
             VENTANA.blit(texto, (x + 15, y + 7))
             EstadoJuego.casillas.append((num, rect))
 
-    etiquetas = ["1-18", "PAR", "ROJO", "NEGRO", "IMPAR", "19-36","1st 12", "2nd 12", "3rd 12"]
-    for i, texto in enumerate(etiquetas):
-        rect = pygame.Rect(x0 + ancho + i * ancho, y0 + alto * 3 + 5, ancho, alto)
+    etiquetas_docenas = ["1st 12", "2nd 12", "3rd 12"]
+    colores_docenas = [GRIS, GRIS, GRIS] 
+    y_docenas = y0 + alto * 3 + 5  # Justo debajo de la tabla de números
+    for i, texto in enumerate(etiquetas_docenas):
+        rect = pygame.Rect(x0 + ancho + i * ancho * 4, y_docenas, ancho * 4, alto)
+        color = colores_docenas[i]
+        pygame.draw.rect(VENTANA, color, rect)
+        pygame.draw.rect(VENTANA, BLANCO, rect, 4)  # Borde blanco más grueso
+        # Sombra para el texto
+        t = pequena.render(texto, True, BLANCO)
+        sombra = pequena.render(texto, True, (0, 0, 0))
+        VENTANA.blit(sombra, (rect.centerx - t.get_width() // 2 + 2, rect.centery - t.get_height() // 2 + 2))
+        VENTANA.blit(t, (rect.centerx - t.get_width() // 2, rect.centery - t.get_height() // 2))
+        EstadoJuego.casillas_extra.append((texto, rect))
+
+    # --- APUESTAS EXTERNAS DEBAJO DE LAS DOCENAS ---
+    etiquetas_inferiores = ["1-18", "PAR", "ROJO", "NEGRO", "IMPAR", "19-36"]
+    y_inferior = y_docenas + alto + 5  # Justo debajo de las docenas
+    for i, texto in enumerate(etiquetas_inferiores):
+        rect = pygame.Rect(x0 + ancho + i * ancho, y_inferior, ancho, alto)
         color = ROJO if texto == "ROJO" else NEGRO if texto == "NEGRO" else GRIS
         pygame.draw.rect(VENTANA, color, rect)
         pygame.draw.rect(VENTANA, BLANCO, rect, 2)
         if texto == "ROJO":
-            # Dibuja un círculo rojo en vez de texto
             pygame.draw.circle(VENTANA, ROJO, rect.center, 10)
         elif texto == "NEGRO":
-            # Dibuja un círculo negro en vez de texto
             pygame.draw.circle(VENTANA, NEGRO, rect.center, 10)
         else:
             t = pequena.render(texto, True, BLANCO)
             VENTANA.blit(t, (rect.centerx - t.get_width() // 2, rect.centery - t.get_height() // 2))
         EstadoJuego.casillas_extra.append((texto, rect))
 
+    # Columnas "2 to 1" (a la derecha del tablero principal)
+    columnas_x = x0 + ancho + 12 * ancho + 10
+    for i in range(3):
+        rect = pygame.Rect(columnas_x, y0 + i * alto, ancho, alto)
+        pygame.draw.rect(VENTANA, GRIS, rect)
+        pygame.draw.rect(VENTANA, BLANCO, rect, 2)
+        t = pequena.render("2 to 1", True, BLANCO)
+        VENTANA.blit(t, (rect.centerx - t.get_width() // 2, rect.centery - t.get_height() // 2))
+        EstadoJuego.casillas_extra.append((f"2to1_{i}", rect))
+        
+        
+        
 def dibujar_fichas():
     y = 580
     start_x = ANCHO // 2 - (len(fichas) * 40) // 2
