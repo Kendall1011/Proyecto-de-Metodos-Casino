@@ -14,6 +14,10 @@ def valor_ficha(valor):
     return valores.get(str(valor), 0)
 
 def es_apuesta_valida(apuestas, nueva_apuesta):
+<<<<<<< HEAD
+=======
+    # Extrae solo el tipo de apuesta (primer elemento de la tupla)
+>>>>>>> 34dc44acb6af2103bdd013803cb774d0ff9b4b88
     tipos = [a[0] if isinstance(a, tuple) else a for a in apuestas]
 
     # No permitir ROJO y NEGRO juntos
@@ -26,8 +30,34 @@ def es_apuesta_valida(apuestas, nueva_apuesta):
         ("IMPAR" in tipos and nueva_apuesta == "PAR")):
         return False
 
+<<<<<<< HEAD
     return True
 
+=======
+    # No permitir 0 en docenas, columnas o calles
+    if nueva_apuesta == 0:
+        return True  # Solo pleno o combinaciones especiales (no implementadas aquí)
+    if (isinstance(nueva_apuesta, str) and nueva_apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]):
+        if 0 in tipos:
+            return False
+
+    # No permitir docenas mezcladas con números fuera de su rango
+    docenas = {
+        "1st 12": range(1, 13),
+        "2nd 12": range(13, 25),
+        "3rd 12": range(25, 37)
+    }
+    if nueva_apuesta in docenas:
+        for t in tipos:
+            if isinstance(t, int) and t not in docenas[nueva_apuesta]:
+                return False
+    if isinstance(nueva_apuesta, int):
+        for d, nums in docenas.items():
+            if d in tipos and nueva_apuesta not in nums:
+                return False
+
+    return True
+>>>>>>> 34dc44acb6af2103bdd013803cb774d0ff9b4b88
 
 class PantallaJuego:
     def __init__(self, cambiar_pantalla_callback):
@@ -61,9 +91,12 @@ class PantallaJuego:
             if self.boton_casa.collidepoint(x, y):
                 self.cambiar_pantalla("inicio")
 
+<<<<<<< HEAD
             # Eliminar validación de banca rota aquí para permitir interacción siempre
             # El mensaje solo se mostrará después de girar si el dinero es 0
 
+=======
+>>>>>>> 34dc44acb6af2103bdd013803cb774d0ff9b4b88
             for i in range(len(fichas)):
                 fx = ANCHO // 2 - (len(fichas) * 40) // 2 + i * 50
                 if (x - fx)**2 + (y - 580)**2 < 400:
@@ -72,6 +105,10 @@ class PantallaJuego:
 
             for num, rect in EstadoJuego.casillas + EstadoJuego.casillas_extra:
                 if EstadoJuego.ficha_seleccionada is not None and rect.collidepoint(x, y):
+<<<<<<< HEAD
+=======
+                    global dinero_j1
+>>>>>>> 34dc44acb6af2103bdd013803cb774d0ff9b4b88
                     valor = valor_ficha(fichas[EstadoJuego.ficha_seleccionada][1])
                     if dinero_j1 >= valor:
                         # --- Validación de apuesta ---
@@ -184,6 +221,7 @@ class PantallaJuego:
                     EstadoJuego.apuestas.clear()
                 self.flash_j1 = "verde" if EstadoJuego.mensaje_resultado == "¡Ganaste!" else "rojo"
                 self.flash_tiempo = pygame.time.get_ticks()
+<<<<<<< HEAD
                 # Mostrar mensaje de banca rota si el dinero es 0
                 if dinero_j1 == 0:
                     pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'banca_rota': True}))
@@ -191,6 +229,10 @@ class PantallaJuego:
         if self.banca_rota:
             if pygame.time.get_ticks() - self.banca_rota_tiempo > 3000:
                 self.banca_rota = False
+=======
+
+
+>>>>>>> 34dc44acb6af2103bdd013803cb774d0ff9b4b88
 
     def dibujar(self, ventana):
         ventana.fill((18, 78, 22))
@@ -289,6 +331,7 @@ class PantallaJuego:
             self.boton_girar.centerx - texto_girar.get_width() // 2,
             self.boton_girar.centery - texto_girar.get_height() // 2
         ))
+<<<<<<< HEAD
 
         # Mensaje de banca rota
         if self.banca_rota:
@@ -310,3 +353,7 @@ class PantallaJuego:
                 ventana.blit(texto_banca_rota, (x_centro, y_pos-1))
             ventana.blit(texto_banca_rota, (x_centro, y_pos))
 
+=======
+        
+        
+>>>>>>> 34dc44acb6af2103bdd013803cb774d0ff9b4b88

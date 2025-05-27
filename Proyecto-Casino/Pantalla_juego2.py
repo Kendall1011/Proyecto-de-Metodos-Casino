@@ -38,7 +38,16 @@ def es_apuesta_valida(apuestas, nueva_apuesta):
         ("IMPAR" in tipos and nueva_apuesta == "PAR")):
         return False
 
+<<<<<<< HEAD
     return True
+=======
+    # No permitir 0 en docenas, columnas o calles
+    if nueva_apuesta == 0:
+        return True
+    if (isinstance(nueva_apuesta, str) and nueva_apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]):
+        if 0 in tipos:
+            return False
+>>>>>>> 34dc44acb6af2103bdd013803cb774d0ff9b4b88
 
     docenas = {
         "1st 12": range(1, 13),
