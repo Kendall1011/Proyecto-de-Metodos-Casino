@@ -40,6 +40,16 @@ def es_apuesta_valida(apuestas, nueva_apuesta):
 
     return True
 
+<<<<<<< HEAD
+=======
+    # No permitir 0 en docenas, columnas o calles
+    if nueva_apuesta == 0:
+        return True
+    if (isinstance(nueva_apuesta, str) and nueva_apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]):
+        if 0 in tipos:
+            return False
+
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
     docenas = {
         "1st 12": range(1, 13),
         "2nd 12": range(13, 25),
@@ -55,8 +65,11 @@ def es_apuesta_valida(apuestas, nueva_apuesta):
                 return False
 
     return True
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
 class Pantalla_juego2:
     def __init__(self, cambiar_pantalla_callback):
         self.cambiar_pantalla = cambiar_pantalla_callback
@@ -93,8 +106,11 @@ class Pantalla_juego2:
         self.banca_rota_j2 = False
         self.banca_rota_tiempo_j1 = 0
         self.banca_rota_tiempo_j2 = 0
+<<<<<<< HEAD
         self.boton_reiniciar_dinero = None
         self.banca_rota_ambos = False
+=======
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
 
     def manejar_evento(self, evento):
         global dinero_j1, dinero_j2
@@ -293,9 +309,12 @@ class Pantalla_juego2:
         if self.banca_rota_j2 and pygame.time.get_ticks() - self.banca_rota_tiempo_j2 > 3000:
             self.banca_rota_j2 = False
 
+<<<<<<< HEAD
         # --- Solo marcar banca rota ambos si ambos están en 0 ---
         self.banca_rota_ambos = (dinero_j1 == 0 and dinero_j2 == 0)
 
+=======
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
     def dibujar(self, ventana):
         ventana.fill((18, 78, 22))
         dibujar_ruleta()
@@ -451,6 +470,7 @@ class Pantalla_juego2:
             s.fill((0,0,0,180))
             ventana.blit(s, (fondo_rect.x, fondo_rect.y))
             ventana.blit(texto_banca_j2, (x_centro, y_banca_rota + 40))
+<<<<<<< HEAD
 
         # --- Botón "Reiniciar dinero" solo si ambos están en 0 ---
         if self.banca_rota_ambos:
@@ -473,3 +493,5 @@ class Pantalla_juego2:
             ventana.blit(txt_btn, (btn_x + btn_w // 2 - txt_btn.get_width() // 2, btn_y + btn_h // 2 - txt_btn.get_height() // 2))
         else:
             self.boton_reiniciar_dinero = None
+=======
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8

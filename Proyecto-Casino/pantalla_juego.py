@@ -16,6 +16,7 @@ def valor_ficha(valor):
 
 def es_apuesta_valida(apuestas, nueva_apuesta):
     tipos = [a[0] if isinstance(a, tuple) else a for a in apuestas]
+<<<<<<< HEAD
     if (("ROJO" in tipos and nueva_apuesta == "NEGRO") or
         ("NEGRO" in tipos and nueva_apuesta == "ROJO")):
         return False
@@ -37,12 +38,28 @@ def reiniciar_estado_juego():
     EstadoJuego.mensaje_resultado = ""
     estado_juego.dinero_j1 = 100000
     estado_juego.dinero_j2 = 100000
+=======
+
+    # No permitir ROJO y NEGRO juntos
+    if (("ROJO" in tipos and nueva_apuesta == "NEGRO") or
+        ("NEGRO" in tipos and nueva_apuesta == "ROJO")):
+        return False
+
+    # No permitir PAR e IMPAR juntos
+    if (("PAR" in tipos and nueva_apuesta == "IMPAR") or
+        ("IMPAR" in tipos and nueva_apuesta == "PAR")):
+        return False
+
+    return True
+
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
 
 class PantallaJuego:
     def __init__(self, cambiar_pantalla_callback):
         self.cambiar_pantalla = cambiar_pantalla_callback
         self.flash_j1 = None
         self.flash_tiempo = 0
+<<<<<<< HEAD
         self.banca_rota = False
         self.boton_reiniciar_dinero = None  # ← Nuevo atributo
         reiniciar_estado_juego()
@@ -52,11 +69,24 @@ class PantallaJuego:
         self.sonido_player_wins = pygame.mixer.Sound("sonidos/player-wins.mp3")
         self.sonido_player_wins.set_volume(0.7)
         self.sonido_player_wins_canal = None
+=======
+        self.banca_rota = False  # Nuevo: estado de banca rota
+
+        # Ensure pygame.mixer is initialized
+        if not pygame.mixer.get_init():
+            pygame.mixer.init()
+
+        self.sonido_player_wins = pygame.mixer.Sound("sonidos/player-wins.mp3")
+        self.sonido_player_wins.set_volume(0.7)
+        self.sonido_player_wins_canal = None
+
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
         self.sonido_ruleta = pygame.mixer.Sound("sonidos/roulette-spin.mp3")
         self.sonido_ruleta.set_volume(0.7)
         self.sonido_ruleta_canal = None
 
     def manejar_evento(self, evento):
+<<<<<<< HEAD
         # --- Manejo del botón reiniciar dinero ---
         if self.banca_rota and self.boton_reiniciar_dinero and evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
@@ -68,6 +98,9 @@ class PantallaJuego:
                 reiniciar_estado_juego()
                 return
 
+=======
+        global dinero_j1
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
         if evento.type == pygame.USEREVENT and hasattr(evento, 'banca_rota') and evento.banca_rota:
             self.banca_rota = True
             self.banca_rota_tiempo = pygame.time.get_ticks()
@@ -75,9 +108,19 @@ class PantallaJuego:
 
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
+<<<<<<< HEAD
             if self.boton_casa.collidepoint(x, y):
                 self.cambiar_pantalla("inicio")
 
+=======
+
+            if self.boton_casa.collidepoint(x, y):
+                self.cambiar_pantalla("inicio")
+
+            # Eliminar validación de banca rota aquí para permitir interacción siempre
+            # El mensaje solo se mostrará después de girar si el dinero es 0
+
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
             for i in range(len(fichas)):
                 fx = ANCHO // 2 - (len(fichas) * 40) // 2 + i * 50
                 if (x - fx)**2 + (y - 580)**2 < 400:
@@ -87,10 +130,18 @@ class PantallaJuego:
             for num, rect in EstadoJuego.casillas + EstadoJuego.casillas_extra:
                 if EstadoJuego.ficha_seleccionada is not None and rect.collidepoint(x, y):
                     valor = valor_ficha(fichas[EstadoJuego.ficha_seleccionada][1])
+<<<<<<< HEAD
                     if estado_juego.dinero_j1 >= valor:
                         if es_apuesta_valida(EstadoJuego.apuestas, num):
                             EstadoJuego.apuestas.append((num, EstadoJuego.ficha_seleccionada))
                             estado_juego.dinero_j1 -= valor
+=======
+                    if dinero_j1 >= valor:
+                        # --- Validación de apuesta ---
+                        if es_apuesta_valida(EstadoJuego.apuestas, num):
+                            EstadoJuego.apuestas.append((num, EstadoJuego.ficha_seleccionada))
+                            dinero_j1 -= valor
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
 
             if self.boton_girar.collidepoint(x, y) and not EstadoJuego.girando:
                 EstadoJuego.velocidad = random.uniform(10, 20)
@@ -112,6 +163,7 @@ class PantallaJuego:
                 self.cambiar_pantalla("estadisticas")
 
     def actualizar(self):
+        global dinero_j1
         if EstadoJuego.girando:
             EstadoJuego.angulo_ruleta += EstadoJuego.velocidad
             EstadoJuego.bola_angulo -= EstadoJuego.velocidad * 1.5
@@ -134,6 +186,33 @@ class PantallaJuego:
                         guardar_resultado(EstadoJuego.resultado_final, color)
                         EstadoJuego.resultado_guardado = True
 
+<<<<<<< HEAD
+=======
+                    # --- Verificar si alguna apuesta es ganadora ---
+                    for apuesta, _ in EstadoJuego.apuestas:
+                        if (
+                            (isinstance(apuesta, int) and apuesta == EstadoJuego.resultado_final) or
+                            (apuesta == "ROJO" and EstadoJuego.resultado_final in rojos) or
+                            (apuesta == "NEGRO" and EstadoJuego.resultado_final in negros) or
+                            (apuesta == "PAR" and EstadoJuego.resultado_final % 2 == 0 and EstadoJuego.resultado_final != 0) or
+                            (apuesta == "IMPAR" and EstadoJuego.resultado_final % 2 == 1) or
+                            (apuesta == "1-18" and 1 <= EstadoJuego.resultado_final <= 18) or
+                            (apuesta == "19-36" and 19 <= EstadoJuego.resultado_final <= 36) or
+                            (apuesta == "1st 12" and 1 <= EstadoJuego.resultado_final <= 12) or
+                            (apuesta == "2nd 12" and 13 <= EstadoJuego.resultado_final <= 24) or
+                            (apuesta == "3rd 12" and 25 <= EstadoJuego.resultado_final <= 36) or
+                            # --- NUEVO: columnas "2 to 1" ---
+                            (apuesta == "2to1_0" and EstadoJuego.resultado_final in [3,6,9,12,15,18,21,24,27,30,33,36]) or
+                            (apuesta == "2to1_1" and EstadoJuego.resultado_final in [2,5,8,11,14,17,20,23,26,29,32,35]) or
+                            (apuesta == "2to1_2" and EstadoJuego.resultado_final in [1,4,7,10,13,16,19,22,25,28,31,34])
+                        ):
+                            EstadoJuego.mensaje_resultado = "¡Ganaste!"
+                            if self.sonido_player_wins_canal is None or not self.sonido_player_wins_canal.get_busy():
+                                self.sonido_player_wins_canal = self.sonido_player_wins.play()
+                            break
+
+                    global dinero_j1
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
                     for apuesta, idx in EstadoJuego.apuestas:
                         valor = valor_ficha(fichas[idx][1])
                         if (
@@ -151,6 +230,7 @@ class PantallaJuego:
                             (apuesta == "2to1_1" and EstadoJuego.resultado_final in [2,5,8,11,14,17,20,23,26,29,32,35]) or
                             (apuesta == "2to1_2" and EstadoJuego.resultado_final in [1,4,7,10,13,16,19,22,25,28,31,34])
                         ):
+<<<<<<< HEAD
                             estado_juego.dinero_j1 += valor * (35 if isinstance(apuesta, int) else 2)
                         elif apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]:
                             estado_juego.dinero_j1 += valor * 3
@@ -165,6 +245,37 @@ class PantallaJuego:
 
         if self.banca_rota and pygame.time.get_ticks() - self.banca_rota_tiempo > 3000:
             self.banca_rota = False
+=======
+                            if isinstance(apuesta, int):
+                                dinero_j1 += valor * 35
+                            else:
+                                dinero_j1 += valor * 2
+                        elif (
+                            (apuesta == "1st 12" and 1 <= EstadoJuego.resultado_final <= 12) or
+                            (apuesta == "2nd 12" and 13 <= EstadoJuego.resultado_final <= 24) or
+                            (apuesta == "3rd 12" and 25 <= EstadoJuego.resultado_final <= 36)
+                        ):
+                            dinero_j1 += valor * 3
+                        # --- NUEVO: pago para columnas "2 to 1" ---
+                        elif (
+                            (apuesta == "2to1_0" and EstadoJuego.resultado_final in [3,6,9,12,15,18,21,24,27,30,33,36]) or
+                            (apuesta == "2to1_1" and EstadoJuego.resultado_final in [2,5,8,11,14,17,20,23,26,29,32,35]) or
+                            (apuesta == "2to1_2" and EstadoJuego.resultado_final in [1,4,7,10,13,16,19,22,25,28,31,34])
+                        ):
+                            dinero_j1 += valor * 3
+
+                    EstadoJuego.apuesta_anterior = EstadoJuego.apuestas[:]
+                    EstadoJuego.apuestas.clear()
+                self.flash_j1 = "verde" if EstadoJuego.mensaje_resultado == "¡Ganaste!" else "rojo"
+                self.flash_tiempo = pygame.time.get_ticks()
+                # Mostrar mensaje de banca rota si el dinero es 0
+                if dinero_j1 == 0:
+                    pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'banca_rota': True}))
+        # Ocultar mensaje de banca rota después de 3 segundos
+        if self.banca_rota:
+            if pygame.time.get_ticks() - self.banca_rota_tiempo > 3000:
+                self.banca_rota = False
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
 
     def dibujar(self, ventana):
         ventana.fill((18, 78, 22))
@@ -228,6 +339,7 @@ class PantallaJuego:
         self.boton_girar = pygame.Rect(ANCHO // 2 - 60, 620, 120, 35)
         pygame.draw.rect(VENTANA, DORADO, self.boton_girar)
         texto_girar = fuente.render("GIRAR", True, NEGRO)
+<<<<<<< HEAD
         ventana.blit(texto_girar, texto_girar.get_rect(center=self.boton_girar.center))
 
         if self.banca_rota:
@@ -251,12 +363,21 @@ class PantallaJuego:
         else:
             self.boton_reiniciar_dinero = None
 
+=======
+        ventana.blit(texto_girar, (
+            self.boton_girar.centerx - texto_girar.get_width() // 2,
+            self.boton_girar.centery - texto_girar.get_height() // 2
+        ))
+
+        # Mensaje de banca rota
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
         if self.banca_rota:
             texto_banca_rota = fuente.render("¡Estás en banca rota!", True, (255, 50, 50))
             x_centro = ANCHO // 2 - texto_banca_rota.get_width() // 2
             y_pos = 30
             fondo_rect = pygame.Rect(x_centro - 16, y_pos - 8, texto_banca_rota.get_width() + 32, texto_banca_rota.get_height() + 16)
             s = pygame.Surface((fondo_rect.width, fondo_rect.height), pygame.SRCALPHA)
+<<<<<<< HEAD
             s.fill((0, 0, 0, 180))
             ventana.blit(s, fondo_rect.topleft)
             ventana.blit(texto_banca_rota, (x_centro, y_pos))
@@ -271,3 +392,18 @@ class PantallaJuego:
             ventana.blit(txt_btn, (btn_x + btn_w // 2 - txt_btn.get_width() // 2, btn_y + btn_h // 2 - txt_btn.get_height() // 2))
         else:
             self.boton_reiniciar_dinero = None
+=======
+            s.fill((0,0,0,180))
+            ventana.blit(s, (fondo_rect.x, fondo_rect.y))
+            try:
+                fuente_bold = pygame.font.Font(fuente.get_name(), fuente.get_height())
+                fuente_bold.set_bold(True)
+                texto_banca_rota = fuente_bold.render("¡Estás en banca rota!", True, (255, 50, 50))
+            except:
+                ventana.blit(texto_banca_rota, (x_centro+1, y_pos))
+                ventana.blit(texto_banca_rota, (x_centro-1, y_pos))
+                ventana.blit(texto_banca_rota, (x_centro, y_pos+1))
+                ventana.blit(texto_banca_rota, (x_centro, y_pos-1))
+            ventana.blit(texto_banca_rota, (x_centro, y_pos))
+
+>>>>>>> b6632b6c3afa9550f9d928bef76df8eaf2eb08e8
