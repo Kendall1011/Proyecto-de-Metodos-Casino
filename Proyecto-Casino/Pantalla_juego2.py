@@ -69,6 +69,7 @@ class Pantalla_juego2:
         self.flash_j1 = None
         self.flash_j2 = None
         self.flash_tiempo = 0
+        self.mostrar_reiniciar = False
 
         self.fichas_j1 = [
             ("darkgoldenrod", "50"), ("saddlebrown", "500"), ("pink", "2.5K"), ("skyblue", "10K"),
@@ -160,6 +161,19 @@ class Pantalla_juego2:
                         dinero_j2 += valor
                     self.apuestas_j2.clear()
                 self.ficha_seleccionada = None
+
+            if self.mostrar_reiniciar:
+                if hasattr(self, "boton_reiniciar") and self.boton_reiniciar.collidepoint(x, y):
+                    dinero_j1 = 100000
+                    dinero_j2 = 100000
+                    self.apuestas_j1.clear()
+                    self.apuestas_j2.clear()
+                    self.resultado_final = None
+                    self.ganador = ""
+                    self.mostrar_reiniciar = False
+                    self.flash_j1 = None
+                    self.flash_j2 = None
+                    return
 
     def actualizar(self):
         global dinero_j1, dinero_j2
@@ -268,6 +282,17 @@ class Pantalla_juego2:
             self.banca_rota_j1 = False
         if self.banca_rota_j2 and pygame.time.get_ticks() - self.banca_rota_tiempo_j2 > 3000:
             self.banca_rota_j2 = False
+
+        # Mostrar botón de reinicio solo si ambos jugadores están en 0,
+        # no hay apuestas pendientes y la ruleta no está girando
+        if (
+            dinero_j1 == 0 and dinero_j2 == 0
+            and not EstadoJuego.girando
+            and not self.apuestas_j1 and not self.apuestas_j2
+        ):
+            self.mostrar_reiniciar = True
+        else:
+            self.mostrar_reiniciar = False
 
     def dibujar(self, ventana):
         ventana.fill((18, 78, 22))
@@ -424,3 +449,25 @@ class Pantalla_juego2:
             s.fill((0,0,0,180))
             ventana.blit(s, (fondo_rect.x, fondo_rect.y))
             ventana.blit(texto_banca_j2, (x_centro, y_banca_rota + 40))
+
+        # Botón de reinicio si ambos están en 0
+        if self.mostrar_reiniciar:
+            ancho_btn = 300
+            alto_btn = 100
+            x_btn = ANCHO // 2 - ancho_btn // 2
+            y_btn = 200
+            self.boton_reiniciar = pygame.Rect(x_btn, y_btn, ancho_btn, alto_btn)
+
+            # Efecto de parpadeo (luces)
+            tiempo = pygame.time.get_ticks() // 300 % 2
+            color_fondo = (255, 0, 0) if tiempo == 0 else (180, 0, 0)
+            color_borde = (255, 255, 0) if tiempo == 0 else (255, 80, 80)
+
+            pygame.draw.rect(ventana, color_borde, self.boton_reiniciar.inflate(10, 10), border_radius=16)
+            pygame.draw.rect(ventana, color_fondo, self.boton_reiniciar, border_radius=12)
+
+            texto_alerta = fuente.render("¡Ambos jugadores están en banca rota!", True, (255, 255, 0))
+            texto_reiniciar = fuente.render("Reiniciar", True, (255, 255, 255))
+
+            ventana.blit(texto_alerta, texto_alerta.get_rect(center=(ANCHO//2, y_btn + 35)))
+            ventana.blit(texto_reiniciar, texto_reiniciar.get_rect(center=(ANCHO//2, y_btn + 75)))

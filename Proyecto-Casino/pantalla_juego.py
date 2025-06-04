@@ -6,6 +6,7 @@ from estado_juego import EstadoJuego
 from datos_juego import fichas, rojos, negros
 from bd import guardar_resultado
 from funciones_dibujo import dibujar_ruleta, dibujar_bolita, dibujar_tablero, dibujar_fichas, dibujar_apuestas, obtener_numero
+from validaciones_apuestas import es_apuesta_ganadora
 
 def valor_ficha(valor):
     valores = {
@@ -139,32 +140,24 @@ class PantallaJuego:
 
                         for apuesta, idx in EstadoJuego.apuestas:
                             valor = valor_ficha(fichas[idx][1])
-                            if (
-                                (isinstance(apuesta, int) and apuesta == EstadoJuego.resultado_final) or
-                                (apuesta == "ROJO" and EstadoJuego.resultado_final in rojos) or
-                                (apuesta == "NEGRO" and EstadoJuego.resultado_final in negros) or
-                                (apuesta == "PAR" and EstadoJuego.resultado_final % 2 == 0 and EstadoJuego.resultado_final != 0) or
-                                (apuesta == "IMPAR" and EstadoJuego.resultado_final % 2 == 1) or
-                                (apuesta == "1-18" and 1 <= EstadoJuego.resultado_final <= 18) or
-                                (apuesta == "19-36" and 19 <= EstadoJuego.resultado_final <= 36) or
-                                (apuesta == "1st 12" and 1 <= EstadoJuego.resultado_final <= 12) or
-                                (apuesta == "2nd 12" and 13 <= EstadoJuego.resultado_final <= 24) or
-                                (apuesta == "3rd 12" and 25 <= EstadoJuego.resultado_final <= 36) or
-                                (apuesta == "2to1_0" and EstadoJuego.resultado_final in [3,6,9,12,15,18,21,24,27,30,33,36]) or
-                                (apuesta == "2to1_1" and EstadoJuego.resultado_final in [2,5,8,11,14,17,20,23,26,29,32,35]) or
-                                (apuesta == "2to1_2" and EstadoJuego.resultado_final in [1,4,7,10,13,16,19,22,25,28,31,34])
-                            ):
-                                estado_juego.dinero_j1 += valor * (35 if isinstance(apuesta, int) else 2)
-                                gano = True  # <--- NUEVO
-                            elif apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]:
-                                estado_juego.dinero_j1 += valor * 3
-                                gano = True  # <--- NUEVO
+                            if es_apuesta_ganadora(apuesta, EstadoJuego.resultado_final):
+                                # Paga según el tipo de apuesta
+                                if isinstance(apuesta, int):
+                                    estado_juego.dinero_j1 += valor * 35
+                                elif apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]:
+                                    estado_juego.dinero_j1 += valor * 3
+                                else:
+                                    estado_juego.dinero_j1 += valor * 2
+                                gano = True
 
                         if gano:
                             EstadoJuego.mensaje_resultado = "¡Ganaste!"
 
                     self.flash_j1 = "verde" if EstadoJuego.mensaje_resultado == "¡Ganaste!" else "rojo"
                     self.flash_tiempo = pygame.time.get_ticks()
+                    # Limpiar apuestas después de mostrar el resultado
+                    EstadoJuego.apuesta_anterior = EstadoJuego.apuestas.copy()
+                    EstadoJuego.apuestas.clear()
                     if estado_juego.dinero_j1 == 0:
                         pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'banca_rota': True}))
                         self.mostrar_reiniciar = True
