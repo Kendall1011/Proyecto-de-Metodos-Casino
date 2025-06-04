@@ -23,3 +23,4 @@ GRIS = (100, 100, 100)
 fuente = pygame.font.SysFont("Arial", 24)
 pequena = pygame.font.SysFont("Arial", 14)
 grande = pygame.font.SysFont("Arial", 32)
+mini = pygame.font.SysFont("Arial", 10)  # Fuente más pequeña para el billete
