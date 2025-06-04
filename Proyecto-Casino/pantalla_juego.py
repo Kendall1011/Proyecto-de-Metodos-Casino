@@ -44,6 +44,7 @@ class PantallaJuego:
         self.flash_j1 = None
         self.flash_tiempo = 0
         self.banca_rota = False
+        self.mostrar_reiniciar = False  # <--- NUEVO
         reiniciar_estado_juego()
 
         if not pygame.mixer.get_init():
@@ -63,6 +64,15 @@ class PantallaJuego:
 
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
+
+            if getattr(self, "mostrar_reiniciar", False):
+                if hasattr(self, "boton_reiniciar") and self.boton_reiniciar.collidepoint(x, y):
+                    estado_juego.dinero_j1 = 100000
+                    EstadoJuego.apuestas.clear()
+                    EstadoJuego.apuesta_anterior.clear()
+                    self.mostrar_reiniciar = False
+                    return
+
             if self.boton_casa.collidepoint(x, y):
                 self.cambiar_pantalla("inicio")
 
@@ -119,6 +129,7 @@ class PantallaJuego:
                 if not EstadoJuego.resultado_guardado:
                     EstadoJuego.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
                     EstadoJuego.mensaje_resultado = "Perdiste"
+                    gano = False  # <--- NUEVO
 
                     if EstadoJuego.resultado_final is not None:
                         color = ("verde" if EstadoJuego.resultado_final == 0
@@ -126,34 +137,39 @@ class PantallaJuego:
                         guardar_resultado(EstadoJuego.resultado_final, color)
                         EstadoJuego.resultado_guardado = True
 
-                    for apuesta, idx in EstadoJuego.apuestas:
-                        valor = valor_ficha(fichas[idx][1])
-                        if (
-                            (isinstance(apuesta, int) and apuesta == EstadoJuego.resultado_final) or
-                            (apuesta == "ROJO" and EstadoJuego.resultado_final in rojos) or
-                            (apuesta == "NEGRO" and EstadoJuego.resultado_final in negros) or
-                            (apuesta == "PAR" and EstadoJuego.resultado_final % 2 == 0 and EstadoJuego.resultado_final != 0) or
-                            (apuesta == "IMPAR" and EstadoJuego.resultado_final % 2 == 1) or
-                            (apuesta == "1-18" and 1 <= EstadoJuego.resultado_final <= 18) or
-                            (apuesta == "19-36" and 19 <= EstadoJuego.resultado_final <= 36) or
-                            (apuesta == "1st 12" and 1 <= EstadoJuego.resultado_final <= 12) or
-                            (apuesta == "2nd 12" and 13 <= EstadoJuego.resultado_final <= 24) or
-                            (apuesta == "3rd 12" and 25 <= EstadoJuego.resultado_final <= 36) or
-                            (apuesta == "2to1_0" and EstadoJuego.resultado_final in [3,6,9,12,15,18,21,24,27,30,33,36]) or
-                            (apuesta == "2to1_1" and EstadoJuego.resultado_final in [2,5,8,11,14,17,20,23,26,29,32,35]) or
-                            (apuesta == "2to1_2" and EstadoJuego.resultado_final in [1,4,7,10,13,16,19,22,25,28,31,34])
-                        ):
-                            estado_juego.dinero_j1 += valor * (35 if isinstance(apuesta, int) else 2)
-                        elif apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]:
-                            estado_juego.dinero_j1 += valor * 3
+                        for apuesta, idx in EstadoJuego.apuestas:
+                            valor = valor_ficha(fichas[idx][1])
+                            if (
+                                (isinstance(apuesta, int) and apuesta == EstadoJuego.resultado_final) or
+                                (apuesta == "ROJO" and EstadoJuego.resultado_final in rojos) or
+                                (apuesta == "NEGRO" and EstadoJuego.resultado_final in negros) or
+                                (apuesta == "PAR" and EstadoJuego.resultado_final % 2 == 0 and EstadoJuego.resultado_final != 0) or
+                                (apuesta == "IMPAR" and EstadoJuego.resultado_final % 2 == 1) or
+                                (apuesta == "1-18" and 1 <= EstadoJuego.resultado_final <= 18) or
+                                (apuesta == "19-36" and 19 <= EstadoJuego.resultado_final <= 36) or
+                                (apuesta == "1st 12" and 1 <= EstadoJuego.resultado_final <= 12) or
+                                (apuesta == "2nd 12" and 13 <= EstadoJuego.resultado_final <= 24) or
+                                (apuesta == "3rd 12" and 25 <= EstadoJuego.resultado_final <= 36) or
+                                (apuesta == "2to1_0" and EstadoJuego.resultado_final in [3,6,9,12,15,18,21,24,27,30,33,36]) or
+                                (apuesta == "2to1_1" and EstadoJuego.resultado_final in [2,5,8,11,14,17,20,23,26,29,32,35]) or
+                                (apuesta == "2to1_2" and EstadoJuego.resultado_final in [1,4,7,10,13,16,19,22,25,28,31,34])
+                            ):
+                                estado_juego.dinero_j1 += valor * (35 if isinstance(apuesta, int) else 2)
+                                gano = True  # <--- NUEVO
+                            elif apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]:
+                                estado_juego.dinero_j1 += valor * 3
+                                gano = True  # <--- NUEVO
 
-                    EstadoJuego.apuesta_anterior = EstadoJuego.apuestas[:]
-                    EstadoJuego.apuestas.clear()
+                        if gano:
+                            EstadoJuego.mensaje_resultado = "¡Ganaste!"
 
-                self.flash_j1 = "verde" if EstadoJuego.mensaje_resultado == "¡Ganaste!" else "rojo"
-                self.flash_tiempo = pygame.time.get_ticks()
-                if estado_juego.dinero_j1 == 0:
-                    pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'banca_rota': True}))
+                    self.flash_j1 = "verde" if EstadoJuego.mensaje_resultado == "¡Ganaste!" else "rojo"
+                    self.flash_tiempo = pygame.time.get_ticks()
+                    if estado_juego.dinero_j1 == 0:
+                        pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'banca_rota': True}))
+                        self.mostrar_reiniciar = True
+                    else:
+                        self.mostrar_reiniciar = False
 
         if self.banca_rota and pygame.time.get_ticks() - self.banca_rota_tiempo > 3000:
             self.banca_rota = False
@@ -231,3 +247,27 @@ class PantallaJuego:
             s.fill((0, 0, 0, 180))
             ventana.blit(s, fondo_rect.topleft)
             ventana.blit(texto_banca_rota, (x_centro, y_pos))
+
+        if self.mostrar_reiniciar:
+            ancho_btn = 260
+            alto_btn = 90
+            x_btn = ANCHO // 2 - ancho_btn // 2
+            y_btn = 180
+            self.boton_reiniciar = pygame.Rect(x_btn, y_btn, ancho_btn, alto_btn)
+
+            # Efecto de parpadeo (luces)
+            tiempo = pygame.time.get_ticks() // 300 % 2
+            color_fondo = (255, 0, 0) if tiempo == 0 else (180, 0, 0)
+            color_borde = (255, 255, 0) if tiempo == 0 else (255, 80, 80)
+
+            # Fondo rojo con borde amarillo/rojo parpadeante
+            pygame.draw.rect(VENTANA, color_borde, self.boton_reiniciar.inflate(10, 10), border_radius=16)
+            pygame.draw.rect(VENTANA, color_fondo, self.boton_reiniciar, border_radius=12)
+
+            texto_alerta = grande.render("¡PERDISTE TODO!", True, (255, 255, 0))
+            texto_sindinero = fuente.render("¡Sin dinero!", True, (255, 255, 255))
+            texto_reiniciar = fuente.render("Reiniciar", True, (255, 255, 255))
+
+            ventana.blit(texto_alerta, texto_alerta.get_rect(center=(ANCHO//2, y_btn + 25)))
+            ventana.blit(texto_sindinero, texto_sindinero.get_rect(center=(ANCHO//2, y_btn + 55)))
+            ventana.blit(texto_reiniciar, texto_reiniciar.get_rect(center=(ANCHO//2, y_btn + 75)))
