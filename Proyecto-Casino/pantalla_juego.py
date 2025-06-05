@@ -152,6 +152,9 @@ class PantallaJuego:
 
                         if gano:
                             EstadoJuego.mensaje_resultado = "¡Ganaste!"
+                            # Reproducir sonido de victoria
+                            if self.sonido_player_wins_canal is None or not self.sonido_player_wins_canal.get_busy():
+                                self.sonido_player_wins_canal = self.sonido_player_wins.play()
 
                     self.flash_j1 = "verde" if EstadoJuego.mensaje_resultado == "¡Ganaste!" else "rojo"
                     self.flash_tiempo = pygame.time.get_ticks()
