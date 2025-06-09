@@ -396,26 +396,23 @@ class Pantalla_juego2:
         texto_turno = fuente.render(f"Turno: Jugador {self.turno}", True, BLANCO)
         ventana.blit(texto_turno, (ANCHO // 2 - texto_turno.get_width() // 2, 580))
 
-        self.boton_casa = pygame.Rect(10, 10, 100, 35)
-        pygame.draw.rect(VENTANA, (255, 230, 100), self.boton_casa, border_radius=8)
-        VENTANA.blit(pequena.render("Volver", True, NEGRO), (
-            self.boton_casa.centerx - pequena.size("Volver")[0] // 2,
-            self.boton_casa.centery - pequena.size("Volver")[1] // 2
-        ))
+        # Botón Volver (píldora)
+        self.boton_casa = pygame.Rect(10, 10, 100, 40)
+        pygame.draw.rect(VENTANA, (255, 230, 100), self.boton_casa, border_radius=20)
+        texto_casa = pequena.render("Volver", True, NEGRO)
+        VENTANA.blit(texto_casa, texto_casa.get_rect(center=self.boton_casa.center))
 
-        self.boton_estadisticas = pygame.Rect(ANCHO - 110, 10, 100, 35)
-        pygame.draw.rect(VENTANA, (50, 150, 255), self.boton_estadisticas, border_radius=8)
-        VENTANA.blit(pequena.render("Estadísticas", True, NEGRO), (
-            self.boton_estadisticas.centerx - pequena.size("Estadísticas")[0] // 2,
-            self.boton_estadisticas.centery - pequena.size("Estadísticas")[1] // 2
-        ))
+        # Botón Estadísticas (píldora)
+        self.boton_estadisticas = pygame.Rect(ANCHO - 110, 10, 100, 40)
+        pygame.draw.rect(VENTANA, (50, 150, 255), self.boton_estadisticas, border_radius=20)
+        texto_est = pequena.render("Estadísticas", True, NEGRO)
+        VENTANA.blit(texto_est, texto_est.get_rect(center=self.boton_estadisticas.center))
 
-        self.boton_turno = pygame.Rect(30, 635, 100, 35)
-        pygame.draw.rect(VENTANA, (255, 180, 0), self.boton_turno, border_radius=8)
-        VENTANA.blit(pequena.render("Turno", True, NEGRO), (
-            self.boton_turno.centerx - pequena.size("Turno")[0] // 2,
-            self.boton_turno.centery - pequena.size("Turno")[1] // 2
-        ))
+        # Botón Turno (píldora)
+        self.boton_turno = pygame.Rect(30, 635, 100, 40)
+        pygame.draw.rect(VENTANA, (255, 180, 0), self.boton_turno, border_radius=20)
+        texto_turno = pequena.render("Turno", True, NEGRO)
+        VENTANA.blit(texto_turno, texto_turno.get_rect(center=self.boton_turno.center))
 
         self.boton_girar = pygame.Rect(ANCHO//2 - 60, 620, 120, 35)
         pygame.draw.rect(VENTANA, DORADO, self.boton_girar)
@@ -424,12 +421,11 @@ class Pantalla_juego2:
             self.boton_girar.centery - 12
         ))
 
-        self.boton_borrar = pygame.Rect(770, 635, 100, 35)
-        pygame.draw.rect(VENTANA, (180, 50, 50), self.boton_borrar, border_radius=8)
-        VENTANA.blit(pequena.render("Limpiar", True, BLANCO), (
-            self.boton_borrar.centerx - pequena.size("Limpiar")[0] // 2,
-            self.boton_borrar.centery - pequena.size("Limpiar")[1] // 2
-        ))
+        # Botón Limpiar (píldora)
+        self.boton_borrar = pygame.Rect(770, 635, 100, 40)
+        pygame.draw.rect(VENTANA, (180, 50, 50), self.boton_borrar, border_radius=20)
+        texto_borrar = pequena.render("Limpiar", True, BLANCO)
+        VENTANA.blit(texto_borrar, texto_borrar.get_rect(center=self.boton_borrar.center))
 
         # Mensaje de banca rota para cada jugador (solo si corresponde y solo por 3 segundos)
         y_banca_rota = 80

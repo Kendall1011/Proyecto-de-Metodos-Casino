@@ -8,18 +8,21 @@ from pantalla_juego2 import Pantalla_juego2
 
 # Variable global para la pantalla actual
 pantalla_actual = None
+pantalla_anterior = "juego"
 
 # Función para cambiar de pantalla
 def cambiar_pantalla(nombre):
-    global pantalla_actual
+    global pantalla_actual, pantalla_anterior
     if nombre == "inicio":
         pantalla_actual = PantallaInicio(cambiar_pantalla)
     elif nombre == "juego":
+        pantalla_anterior = "juego"
         pantalla_actual = PantallaJuego(cambiar_pantalla)
     elif nombre == "juego2":
+        pantalla_anterior = "juego2"
         pantalla_actual = Pantalla_juego2(cambiar_pantalla)
     elif nombre == "estadisticas":
-        pantalla_actual = PantallaEstadisticas(lambda: cambiar_pantalla("juego"))
+        pantalla_actual = PantallaEstadisticas(lambda: cambiar_pantalla(pantalla_anterior))
 
 
 
