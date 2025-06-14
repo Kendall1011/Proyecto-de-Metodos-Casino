@@ -129,8 +129,7 @@ class PantallaJuego:
                     self.sonido_ruleta_canal.stop()
                 if not EstadoJuego.resultado_guardado:
                     EstadoJuego.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
-                    EstadoJuego.mensaje_resultado = "Perdiste"
-                    gano = False  # <--- NUEVO
+                    gano = False
 
                     if EstadoJuego.resultado_final is not None:
                         color = ("verde" if EstadoJuego.resultado_final == 0
@@ -138,23 +137,26 @@ class PantallaJuego:
                         guardar_resultado(EstadoJuego.resultado_final, color)
                         EstadoJuego.resultado_guardado = True
 
-                        for apuesta, idx in EstadoJuego.apuestas:
-                            valor = valor_ficha(fichas[idx][1])
-                            if es_apuesta_ganadora(apuesta, EstadoJuego.resultado_final):
-                                # Paga según el tipo de apuesta
-                                if isinstance(apuesta, int):
-                                    estado_juego.dinero_j1 += valor * 35
-                                elif apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]:
-                                    estado_juego.dinero_j1 += valor * 3
-                                else:
-                                    estado_juego.dinero_j1 += valor * 2
-                                gano = True
+                        if EstadoJuego.apuestas:  # Solo mostrar mensaje si hubo apuestas
+                            for apuesta, idx in EstadoJuego.apuestas:
+                                valor = valor_ficha(fichas[idx][1])
+                                if es_apuesta_ganadora(apuesta, EstadoJuego.resultado_final):
+                                    if isinstance(apuesta, int):
+                                        estado_juego.dinero_j1 += valor * 35
+                                    elif apuesta in ["1st 12", "2nd 12", "3rd 12", "2to1_0", "2to1_1", "2to1_2"]:
+                                        estado_juego.dinero_j1 += valor * 3
+                                    else:
+                                        estado_juego.dinero_j1 += valor * 2
+                                    gano = True
 
-                        if gano:
-                            EstadoJuego.mensaje_resultado = "¡Ganaste!"
-                            # Reproducir sonido de victoria
-                            if self.sonido_player_wins_canal is None or not self.sonido_player_wins_canal.get_busy():
-                                self.sonido_player_wins_canal = self.sonido_player_wins.play()
+                            if gano:
+                                EstadoJuego.mensaje_resultado = "¡Ganaste!"
+                                if self.sonido_player_wins_canal is None or not self.sonido_player_wins_canal.get_busy():
+                                    self.sonido_player_wins_canal = self.sonido_player_wins.play()
+                            else:
+                                EstadoJuego.mensaje_resultado = "Perdiste"
+                        else:
+                            EstadoJuego.mensaje_resultado = ""  # No mostrar nada si no apostó
 
                     self.flash_j1 = "verde" if EstadoJuego.mensaje_resultado == "¡Ganaste!" else "rojo"
                     self.flash_tiempo = pygame.time.get_ticks()

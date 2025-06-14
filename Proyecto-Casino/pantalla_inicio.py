@@ -69,7 +69,7 @@ class PantallaInicio:
 
         brillo = 180 + int(75 * math.sin(self.tiempo))
         color_texto = (brillo, brillo, 0)
-        texto = grande.render("CASINO UCR", True, color_texto)
+        texto = grande.render("MonteCarloBet", True, color_texto)
         ventana.blit(texto, (cartel_x + cartel_ancho // 2 - texto.get_width() // 2, cartel_y + cartel_alto // 2 - texto.get_height() // 2))
 
         # Fichas
