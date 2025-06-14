@@ -120,16 +120,16 @@ class PantallaEstadisticas:
                 if self.scroll_offset > 0:
                     self.scroll_offset -= 1
 
-
     def actualizar(self):
         pass
 
     def dibujar(self, ventana):
         ventana.fill(BLANCO)
 
-        # Título
-        titulo = fuente.render("Estadísticas de Giros", True, BLANCO)
-        ventana.blit(titulo, (ANCHO // 2 - titulo.get_width() // 2, 10))
+        # Total de giros arriba del todo centrado con borde negro
+        total_txt = fuente.render(f"Total de giros: {self.total}", True, NEGRO)
+        ventana.blit(total_txt, (ANCHO // 2 - total_txt.get_width() // 2, 10))
+        pygame.draw.rect(ventana, NEGRO, (ANCHO // 2 - total_txt.get_width() // 2 - 10, 8, total_txt.get_width() + 20, total_txt.get_height() + 4), 1)
 
         # Gráfico de barras
         if os.path.exists("grafico_barras.png"):
@@ -168,41 +168,63 @@ class PantallaEstadisticas:
             ventana.blit(pequena.render(f"{porcentaje:.1f}%", True, NEGRO), (x_col3, y_base))
             ventana.blit(pequena.render(color, True, NEGRO), (x_col4, y_base))
             y_base += 22
-        
+
         # Indicador de scroll
         if self.max_scroll > 0:
             scroll_text = pequena.render(f"▲▼ ({self.scroll_offset+1}-{min(self.scroll_offset+filas_visibles, len(filas))}/{len(filas)})", True, NEGRO)
             ventana.blit(scroll_text, (x_col4 + 60, 260))
-        
-        
-        # Total de giros
-        total_txt = fuente.render(f"Total de giros: {self.total}", True, NEGRO)
-        ventana.blit(total_txt, (80, 520))
 
-         # Botones pequeños y alineados abajo a la derecha
+        # Título recomendaciones
+        titulo_reco = fuente.render("Recomendaciones:", True, NEGRO)
+        ventana.blit(titulo_reco, (80, 555))
+
+        # Mostrar recomendaciones con colores específicos
+        recomendaciones = self.generar_recomendaciones()
+        colores = [(0, 150, 0), NEGRO, (200, 0, 0), NEGRO, NEGRO]
+        y_reco = 590
+        for i, reco in enumerate(recomendaciones):
+            color = colores[i % len(colores)]
+            texto_reco = pequena.render("* " + reco, True, color)
+            ventana.blit(texto_reco, (80, y_reco))
+            y_reco += 25
+
+        # Botones
         boton_ancho = 90
         boton_alto = 30
         espacio_botones = 12
         margen_derecho = 30
         margen_inferior = 20
 
-        self.boton_exportar = pygame.Rect(
-            ANCHO - boton_ancho - margen_derecho,
-            ALTO - boton_alto - margen_inferior,
-            boton_ancho, boton_alto
-        )
-        self.boton_volver = pygame.Rect(
-            ANCHO - 2 * boton_ancho - espacio_botones - margen_derecho,
-            ALTO - boton_alto - margen_inferior,
-            boton_ancho, boton_alto
-        )
+        self.boton_exportar = pygame.Rect(ANCHO - boton_ancho - margen_derecho, ALTO - boton_alto - margen_inferior, boton_ancho, boton_alto)
+        self.boton_volver = pygame.Rect(ANCHO - 2 * boton_ancho - espacio_botones - margen_derecho, ALTO - boton_alto - margen_inferior, boton_ancho, boton_alto)
 
         pygame.draw.rect(ventana, (180, 180, 0), self.boton_volver, border_radius=8)
         texto_btn = fuente.render("Volver", True, (0, 0, 0))
-        ventana.blit(texto_btn, (self.boton_volver.centerx - texto_btn.get_width() // 2,
-                                 self.boton_volver.centery - texto_btn.get_height() // 2))
+        ventana.blit(texto_btn, (self.boton_volver.centerx - texto_btn.get_width() // 2, self.boton_volver.centery - texto_btn.get_height() // 2))
 
         pygame.draw.rect(ventana, (100, 200, 100), self.boton_exportar, border_radius=8)
         texto_exp = fuente.render("CSV", True, (0, 0, 0))
-        ventana.blit(texto_exp, (self.boton_exportar.centerx - texto_exp.get_width() // 2,
-                                 self.boton_exportar.centery - texto_exp.get_height() // 2))
+        ventana.blit(texto_exp, (self.boton_exportar.centerx - texto_exp.get_width() // 2, self.boton_exportar.centery - texto_exp.get_height() // 2))
+
+    def generar_recomendaciones(self):
+        recomendaciones = []
+
+        color_mas_frecuente = max(self.colores_contador, key=self.colores_contador.get)
+        veces_color = self.colores_contador[color_mas_frecuente]
+        porcentaje_color = (veces_color / self.total) * 100
+        recomendaciones.append(f"Se recomienda apostar al color {color_mas_frecuente} porque ha salido un {porcentaje_color:.2f}% de las veces.")
+
+        numero_mas_frecuente = max(range(len(self.frecuencias)), key=lambda i: self.frecuencias[i])
+        veces_num = self.frecuencias[numero_mas_frecuente]
+        recomendaciones.append(f"El número que más ha salido es el {numero_mas_frecuente} ({veces_num} veces).")
+
+        if self.colores_contador["verde"] == 0:
+            recomendaciones.append("No se recomienda apostar al verde (0), ya que nunca ha salido.")
+
+        menor_frecuencia = min([f for f in self.frecuencias if f > 0])
+        numeros_menos_frecuentes = [i for i, f in enumerate(self.frecuencias) if f == menor_frecuencia]
+        recomendaciones.append(f"No se recomienda apostar al número {numeros_menos_frecuentes[0]} que ha salido solo {menor_frecuencia} veces.")
+
+        recomendaciones.append("Se recomienda apostar a la zona 1st 12, ya que concentra varios números con alta frecuencia.")
+
+        return recomendaciones
