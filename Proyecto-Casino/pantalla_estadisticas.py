@@ -225,6 +225,14 @@ class PantallaEstadisticas:
         numeros_menos_frecuentes = [i for i, f in enumerate(self.frecuencias) if f == menor_frecuencia]
         recomendaciones.append(f"No se recomienda apostar al número {numeros_menos_frecuentes[0]} que ha salido solo {menor_frecuencia} veces.")
 
-        recomendaciones.append("Se recomienda apostar a la zona 1st 12, ya que concentra varios números con alta frecuencia.")
+        zonas = {
+            "1st 12": sum(self.frecuencias[1:12]),
+            "2nd 12": sum(self.frecuencias[13:24]),
+            "3rd 12": sum(self.frecuencias[25:36])
+        }
+        zona_mas_frecuente = max(zonas, key=zonas.get)
+        veces_zona = zonas[zona_mas_frecuente]
+        porcentaje_zona = (veces_zona / self.total) * 100 if self.total > 0 else 0
+        recomendaciones.append(f"La zona {zona_mas_frecuente} es la más frecuente ({porcentaje_zona:.2f}% de los giros en esa zona).")
 
         return recomendaciones
