@@ -5,6 +5,7 @@ from pantalla_inicio import PantallaInicio
 from pantalla_juego import PantallaJuego
 from pantalla_estadisticas import PantallaEstadisticas
 from pantalla_juego2 import Pantalla_juego2
+from pantalla_recomendaciones import PantallaRecomendaciones
 
 # Variable global para la pantalla actual
 pantalla_actual = None
@@ -22,9 +23,15 @@ def cambiar_pantalla(nombre):
         pantalla_anterior = "juego2"
         pantalla_actual = Pantalla_juego2(cambiar_pantalla)
     elif nombre == "estadisticas":
-        pantalla_actual = PantallaEstadisticas(lambda: cambiar_pantalla(pantalla_anterior))
-
-
+        def ir_a_recomendaciones():
+            consejos_generales, recomendaciones_historial = pantalla_actual.generar_recomendaciones()
+            pantalla_reco = PantallaRecomendaciones(
+                lambda: cambiar_pantalla("estadisticas"),
+                consejos_generales,
+                recomendaciones_historial
+            )
+            globals()["pantalla_actual"] = pantalla_reco
+        pantalla_actual = PantallaEstadisticas(lambda: cambiar_pantalla(pantalla_anterior), ir_a_recomendaciones)
 
 # Bucle principal del juego
 def main():

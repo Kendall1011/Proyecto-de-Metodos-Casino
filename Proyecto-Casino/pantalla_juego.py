@@ -6,7 +6,7 @@ from estado_juego import EstadoJuego
 from datos_juego import fichas, rojos, negros
 from bd import guardar_resultado
 from funciones_dibujo import dibujar_ruleta, dibujar_bolita, dibujar_tablero, dibujar_fichas, dibujar_apuestas, obtener_numero
-from validaciones_apuestas import es_apuesta_ganadora
+from validaciones_apuestas import es_apuesta_ganadora, validar_apuestas
 
 def valor_ficha(valor):
     valores = {
@@ -87,9 +87,19 @@ class PantallaJuego:
                 if EstadoJuego.ficha_seleccionada is not None and rect.collidepoint(x, y):
                     valor = valor_ficha(fichas[EstadoJuego.ficha_seleccionada][1])
                     if estado_juego.dinero_j1 >= valor:
+                        # 1. Validar compatibilidad con las apuestas actuales
                         if es_apuesta_valida(EstadoJuego.apuestas, num):
-                            EstadoJuego.apuestas.append((num, EstadoJuego.ficha_seleccionada))
-                            estado_juego.dinero_j1 -= valor
+                            # 2. Validar todas las apuestas (opcional, para reglas extra)
+                            apuestas_temp = [a[0] if isinstance(a, tuple) else a for a in EstadoJuego.apuestas] + [num]
+                            if validar_apuestas(apuestas_temp, None):  # None porque aún no hay resultado
+                                EstadoJuego.apuestas.append((num, EstadoJuego.ficha_seleccionada))
+                                estado_juego.dinero_j1 -= valor
+                            else:
+                                # Mostrar mensaje: combinación inválida
+                                pass
+                        else:
+                            # Mostrar mensaje: combinación inválida
+                            pass
 
             if self.boton_girar.collidepoint(x, y) and not EstadoJuego.girando:
                 EstadoJuego.velocidad = random.uniform(10, 20)

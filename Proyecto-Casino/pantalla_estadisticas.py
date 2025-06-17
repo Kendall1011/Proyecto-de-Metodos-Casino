@@ -9,8 +9,9 @@ rojos = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
 negros = [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35]
 
 class PantallaEstadisticas:
-    def __init__(self, volver_callback):
+    def __init__(self, volver_callback, sugerencias_callback):
         self.volver_callback = volver_callback
+        self.sugerencias_callback = sugerencias_callback
         self.frecuencias = [0] * 37
         self.total = 0
         self.colores_contador = {"rojo": 0, "negro": 0, "verde": 0}
@@ -112,6 +113,8 @@ class PantallaEstadisticas:
                 self.volver_callback()
             elif self.boton_exportar.collidepoint(x, y):
                 self.exportar_csv()
+            elif self.boton_recomendaciones.collidepoint(x, y):
+                self.sugerencias_callback()  # <-- Aquí llamas al callback
         elif evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_DOWN:
                 if self.scroll_offset < self.max_scroll:
@@ -174,19 +177,7 @@ class PantallaEstadisticas:
             scroll_text = pequena.render(f"▲▼ ({self.scroll_offset+1}-{min(self.scroll_offset+filas_visibles, len(filas))}/{len(filas)})", True, NEGRO)
             ventana.blit(scroll_text, (x_col4 + 60, 260))
 
-        # Título recomendaciones
-        titulo_reco = fuente.render("Recomendaciones:", True, NEGRO)
-        ventana.blit(titulo_reco, (80, 555))
-
-        # Mostrar recomendaciones con colores específicos
-        recomendaciones = self.generar_recomendaciones()
-        colores = [(0, 150, 0), NEGRO, (200, 0, 0), NEGRO, NEGRO]
-        y_reco = 590
-        for i, reco in enumerate(recomendaciones):
-            color = colores[i % len(colores)]
-            texto_reco = pequena.render("* " + reco, True, color)
-            ventana.blit(texto_reco, (80, y_reco))
-            y_reco += 25
+       
 
         # Botones
         boton_ancho = 90
@@ -202,37 +193,100 @@ class PantallaEstadisticas:
         texto_btn = fuente.render("Volver", True, (0, 0, 0))
         ventana.blit(texto_btn, (self.boton_volver.centerx - texto_btn.get_width() // 2, self.boton_volver.centery - texto_btn.get_height() // 2))
 
-        pygame.draw.rect(ventana, (100, 200, 100), self.boton_exportar, border_radius=8)
-        texto_exp = fuente.render("CSV", True, (0, 0, 0))
+        pygame.draw.rect(ventana, (0, 120, 255), self.boton_exportar, border_radius=8)  # Azul
+        texto_exp = fuente.render("CSV", True, (255, 255, 255))
         ventana.blit(texto_exp, (self.boton_exportar.centerx - texto_exp.get_width() // 2, self.boton_exportar.centery - texto_exp.get_height() // 2))
 
+        # Nuevo botón verde "Recomendaciones"
+        self.boton_recomendaciones = pygame.Rect(ANCHO - 3 * boton_ancho - 2 * espacio_botones - margen_derecho,ALTO - boton_alto - margen_inferior,boton_ancho,boton_alto)
+        pygame.draw.rect(ventana, (100, 200, 100), self.boton_recomendaciones, border_radius=8)
+        texto_reco_btn = pequena.render("Sugerencias", True, (0, 0, 0))
+        ventana.blit(
+            texto_reco_btn,
+            (
+                self.boton_recomendaciones.centerx - texto_reco_btn.get_width() // 2,
+                self.boton_recomendaciones.centery - texto_reco_btn.get_height() // 2
+            )
+        )
+
     def generar_recomendaciones(self):
+        # Consejos generales (sin datos)
+        consejos_generales = [
+            "Recuerda que la ruleta es un juego de azar, juega de manera responsable.",
+            "No apuestes grandes sumas en una sola jugada; distribuye tu capital para minimizar riesgos.",
+            "Si detectas una tendencia, puedes aprovecharla, pero no confíes en que continuará indefinidamente.",
+            "Consulta las estadísticas regularmente para ajustar tu estrategia.",
+            "Establece un límite de pérdidas y respétalo para evitar decisiones impulsivas.",
+            "El objetivo principal es disfrutar el juego. ¡Juega con responsabilidad!"
+        ]
+
         recomendaciones = []
 
-        color_mas_frecuente = max(self.colores_contador, key=self.colores_contador.get)
-        veces_color = self.colores_contador[color_mas_frecuente]
-        porcentaje_color = (veces_color / self.total) * 100
-        recomendaciones.append(f"Se recomienda apostar al color {color_mas_frecuente} porque ha salido un {porcentaje_color:.2f}% de las veces.")
+        # Ejemplo de recomendaciones basadas en datos:
+        if self.total > 0:
+            color_mas_frecuente = max(["rojo", "negro", "verde"], key=lambda c: getattr(self, "colores_contador", {}).get(c, 0))
+            veces_color = getattr(self, "colores_contador", {}).get(color_mas_frecuente, 0)
+            porcentaje_color = (veces_color / self.total) * 100 if self.total > 0 else 0
+            recomendaciones.append(
+                f"Se recomienda apostar al color {color_mas_frecuente} porque ha salido {veces_color} veces, representando el {porcentaje_color:.2f}% de los giros."
+            )
 
-        numero_mas_frecuente = max(range(len(self.frecuencias)), key=lambda i: self.frecuencias[i])
-        veces_num = self.frecuencias[numero_mas_frecuente]
-        recomendaciones.append(f"El número que más ha salido es el {numero_mas_frecuente} ({veces_num} veces).")
+            numero_mas_frecuente = max(range(len(self.frecuencias)), key=lambda i: self.frecuencias[i])
+            veces_num = self.frecuencias[numero_mas_frecuente]
+            porcentaje_num = (veces_num / self.total) * 100 if self.total > 0 else 0
+            recomendaciones.append(
+                f"El número que más ha salido es el {numero_mas_frecuente} ({veces_num} veces, {porcentaje_num:.2f}% de los giros)."
+            )
 
-        if self.colores_contador["verde"] == 0:
-            recomendaciones.append("No se recomienda apostar al verde (0), ya que nunca ha salido.")
+            menor_frecuencia = min([f for f in self.frecuencias if f > 0])
+            numeros_menos_frecuentes = [i for i, f in enumerate(self.frecuencias) if f == menor_frecuencia]
+            lista_menores = ', '.join(str(n) for n in numeros_menos_frecuentes)
+            recomendaciones.append(
+                f"No se recomienda apostar a los números {lista_menores}, ya que cada uno ha salido solo {menor_frecuencia} veces."
+            )
 
-        menor_frecuencia = min([f for f in self.frecuencias if f > 0])
-        numeros_menos_frecuentes = [i for i, f in enumerate(self.frecuencias) if f == menor_frecuencia]
-        recomendaciones.append(f"No se recomienda apostar al número {numeros_menos_frecuentes[0]} que ha salido solo {menor_frecuencia} veces.")
+            if getattr(self, "colores_contador", {}).get("verde", 0) == 0:
+                recomendaciones.append("No se recomienda apostar al verde (0), ya que nunca ha salido en el historial actual.")
 
-        zonas = {
-            "1st 12": sum(self.frecuencias[1:12]),
-            "2nd 12": sum(self.frecuencias[13:24]),
-            "3rd 12": sum(self.frecuencias[25:36])
-        }
-        zona_mas_frecuente = max(zonas, key=zonas.get)
-        veces_zona = zonas[zona_mas_frecuente]
-        porcentaje_zona = (veces_zona / self.total) * 100 if self.total > 0 else 0
-        recomendaciones.append(f"La zona {zona_mas_frecuente} es la más frecuente ({porcentaje_zona:.2f}% de los giros son de esa zona).")
+            zonas = {
+                "1st 12": sum(self.frecuencias[1:13]),
+                "2nd 12": sum(self.frecuencias[13:25]),
+                "3rd 12": sum(self.frecuencias[25:37])
+            }
+            zona_mas_frecuente = max(zonas, key=zonas.get)
+            veces_zona = zonas[zona_mas_frecuente]
+            porcentaje_zona = (veces_zona / self.total) * 100 if self.total > 0 else 0
+            recomendaciones.append(
+                f"La zona más frecuente es {zona_mas_frecuente} con {veces_zona} apariciones ({porcentaje_zona:.2f}% de los giros)."
+            )
 
-        return recomendaciones
+            pares = sum(self.frecuencias[i] for i in range(2, 37, 2))
+            impares = sum(self.frecuencias[i] for i in range(1, 37, 2))
+            if pares > impares:
+                recomendaciones.append(
+                    f"Han salido más números pares ({pares}) que impares ({impares}), podrías considerar apostar a PAR."
+                )
+            elif impares > pares:
+                recomendaciones.append(
+                    f"Han salido más números impares ({impares}) que pares ({pares}), podrías considerar apostar a IMPAR."
+                )
+
+            # Mitades
+            bajos = sum(self.frecuencias[1:19])
+            altos = sum(self.frecuencias[19:37])
+            if bajos > altos:
+                recomendaciones.append(
+                    f"Han salido más números bajos (1-18): {bajos} veces, que altos (19-36): {altos} veces."
+                )
+            elif altos > bajos:
+                recomendaciones.append(
+                    f"Han salido más números altos (19-36): {altos} veces, que bajos (1-18): {bajos} veces."
+                )
+
+            # Rachas de color
+            if veces_color >= 3:
+                recomendaciones.append(
+                    f"¡Atención! El color {color_mas_frecuente} lleva una racha de {veces_color} apariciones."
+                )
+
+        return consejos_generales, recomendaciones

@@ -8,6 +8,7 @@ from funciones_dibujo import (
     dibujar_ruleta, dibujar_bolita, dibujar_tablero,
     dibujar_apuestas_color, obtener_numero, dibujar_ficha_estilo_casino
 )
+from validaciones_apuestas import es_apuesta_ganadora, validar_apuestas
 
 def valor_ficha(valor):
     valores = {
@@ -127,13 +128,19 @@ class Pantalla_juego2:
                 if self.ficha_seleccionada and rect.collidepoint(x, y):
                     valor = valor_ficha(self.ficha_seleccionada[1])
                     if self.turno == 1 and dinero_j1 >= valor:
+                        # 1. Validar compatibilidad con las apuestas actuales
                         if es_apuesta_valida([a for a, _, _ in self.apuestas_j1], num):
-                            self.apuestas_j1.append((num, self.ficha_seleccionada[0], valor))
-                            dinero_j1 -= valor
+                            # 2. Validar todas las apuestas (opcional)
+                            apuestas_temp = [a for a, _, _ in self.apuestas_j1] + [num]
+                            if validar_apuestas(apuestas_temp, None):
+                                self.apuestas_j1.append((num, self.ficha_seleccionada[0], valor))
+                                dinero_j1 -= valor
                     elif self.turno == 2 and dinero_j2 >= valor:
                         if es_apuesta_valida([a for a, _, _ in self.apuestas_j2], num):
-                            self.apuestas_j2.append((num, self.ficha_seleccionada[0], valor))
-                            dinero_j2 -= valor
+                            apuestas_temp = [a for a, _, _ in self.apuestas_j2] + [num]
+                            if validar_apuestas(apuestas_temp, None):
+                                self.apuestas_j2.append((num, self.ficha_seleccionada[0], valor))
+                                dinero_j2 -= valor
 
             if self.boton_turno.collidepoint(x, y):
                 self.turno = 2 if self.turno == 1 else 1
