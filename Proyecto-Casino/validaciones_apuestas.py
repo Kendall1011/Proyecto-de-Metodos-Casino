@@ -33,7 +33,7 @@ negros = [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35]
 
 def validar_apuestas(apuestas, resultado_final):
  
-    apuestas = [ap.lower() for ap in apuestas]
+    apuestas = [ap.lower() if isinstance(ap, str) else ap for ap in apuestas]
 
     if 'rojo' in apuestas and 'negro' in apuestas:
         return False
@@ -51,6 +51,9 @@ def validar_apuestas(apuestas, resultado_final):
     columnas = {'2 to 1 (left)', '2 to 1 (middle)', '2 to 1 (right)'}
     if columnas.issubset(set(apuestas)):
         return False
+
+    if resultado_final is None:
+        return True  # O ajusta según tu lógica, pero evita comparar con None
 
     for apuesta in apuestas:
         if apuesta == "1st 12":

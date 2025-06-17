@@ -57,6 +57,13 @@ class PantallaJuego:
         self.sonido_ruleta.set_volume(0.7)
         self.sonido_ruleta_canal = None
 
+        # NUEVO: Cargar sonidos adicionales
+        self.sonido_apostar = pygame.mixer.Sound("sonidos/Apostar.mp3")
+        self.sonido_apostar.set_volume(0.7)
+        self.sonido_perdedor = pygame.mixer.Sound("sonidos/Perdedor.mp3")
+        self.sonido_perdedor.set_volume(0.7)
+        self.sonido_perdedor_canal = None
+
     def manejar_evento(self, evento):
         if evento.type == pygame.USEREVENT and hasattr(evento, 'banca_rota') and evento.banca_rota:
             self.banca_rota = True
@@ -94,6 +101,8 @@ class PantallaJuego:
                             if validar_apuestas(apuestas_temp, None):  # None porque aún no hay resultado
                                 EstadoJuego.apuestas.append((num, EstadoJuego.ficha_seleccionada))
                                 estado_juego.dinero_j1 -= valor
+                                # NUEVO: Sonido al apostar
+                                self.sonido_apostar.play()
                             else:
                                 # Mostrar mensaje: combinación inválida
                                 pass
@@ -172,6 +181,9 @@ class PantallaJuego:
                                     self.sonido_player_wins_canal = self.sonido_player_wins.play()
                             else:
                                 EstadoJuego.mensaje_resultado = "Perdiste"
+                                # NUEVO: Sonido de perder
+                                if self.sonido_perdedor_canal is None or not self.sonido_perdedor_canal.get_busy():
+                                    self.sonido_perdedor_canal = self.sonido_perdedor.play()
                         else:
                             EstadoJuego.mensaje_resultado = ""  # No mostrar nada si no apostó
 

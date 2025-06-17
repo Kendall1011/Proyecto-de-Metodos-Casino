@@ -91,6 +91,13 @@ class Pantalla_juego2:
         self.sonido_player_wins.set_volume(0.7)
         self.sonido_player_wins_canal = None  # Para controlar el canal de reproducción
 
+        # NUEVO: Cargar sonidos adicionales
+        self.sonido_apostar = pygame.mixer.Sound("sonidos/Apostar.mp3")
+        self.sonido_apostar.set_volume(0.7)
+        self.sonido_perdedor = pygame.mixer.Sound("sonidos/Perdedor.mp3")
+        self.sonido_perdedor.set_volume(0.7)
+        self.sonido_perdedor_canal = None
+
         self.banca_rota_j1 = False
         self.banca_rota_j2 = False
         self.banca_rota_tiempo_j1 = 0
@@ -135,12 +142,16 @@ class Pantalla_juego2:
                             if validar_apuestas(apuestas_temp, None):
                                 self.apuestas_j1.append((num, self.ficha_seleccionada[0], valor))
                                 dinero_j1 -= valor
+                                # NUEVO: Sonido al apostar
+                                self.sonido_apostar.play()
                     elif self.turno == 2 and dinero_j2 >= valor:
                         if es_apuesta_valida([a for a, _, _ in self.apuestas_j2], num):
                             apuestas_temp = [a for a, _, _ in self.apuestas_j2] + [num]
                             if validar_apuestas(apuestas_temp, None):
                                 self.apuestas_j2.append((num, self.ficha_seleccionada[0], valor))
                                 dinero_j2 -= valor
+                                # NUEVO: Sonido al apostar
+                                self.sonido_apostar.play()
 
             if self.boton_turno.collidepoint(x, y):
                 self.turno = 2 if self.turno == 1 else 1
@@ -196,11 +207,8 @@ class Pantalla_juego2:
 
             if EstadoJuego.velocidad < 0.1:
                 EstadoJuego.girando = False
-
-                # Detener el sonido cuando termina de girar
                 if self.sonido_ruleta_canal is not None:
                     self.sonido_ruleta_canal.stop()
-
                 if not EstadoJuego.resultado_guardado:
                     self.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
                     color = (
@@ -266,11 +274,17 @@ class Pantalla_juego2:
                         self.flash_j1 = "verde"
                     elif self.apuestas_j1:
                         self.flash_j1 = "rojo"
+                        # NUEVO: Sonido de perder para J1
+                        if self.sonido_perdedor_canal is None or not self.sonido_perdedor_canal.get_busy():
+                            self.sonido_perdedor_canal = self.sonido_perdedor.play()
 
                     if j2_total > 0:
                         self.flash_j2 = "verde"
                     elif self.apuestas_j2:
                         self.flash_j2 = "rojo"
+                        # NUEVO: Sonido de perder para J2
+                        if self.sonido_perdedor_canal is None or not self.sonido_perdedor_canal.get_busy():
+                            self.sonido_perdedor_canal = self.sonido_perdedor.play()
 
                     self.flash_tiempo = pygame.time.get_ticks()
 
