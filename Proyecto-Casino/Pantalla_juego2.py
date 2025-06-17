@@ -84,14 +84,14 @@ class Pantalla_juego2:
         # Cargar el sonido de la ruleta
         self.sonido_ruleta = pygame.mixer.Sound("sonidos/roulette-spin.mp3")
         self.sonido_ruleta.set_volume(0.7)
-        self.sonido_ruleta_canal = None  # Para controlar el canal de reproducción
+        self.sonido_ruleta_canal = None
 
         # Cargar el sonido de victoria
         self.sonido_player_wins = pygame.mixer.Sound("sonidos/player-wins.mp3")
         self.sonido_player_wins.set_volume(0.7)
-        self.sonido_player_wins_canal = None  # Para controlar el canal de reproducción
+        self.sonido_player_wins_canal = None
 
-        # NUEVO: Cargar sonidos adicionales
+        # NUEVO: Cargar sonidos de apostar y perder
         self.sonido_apostar = pygame.mixer.Sound("sonidos/Apostar.mp3")
         self.sonido_apostar.set_volume(0.7)
         self.sonido_perdedor = pygame.mixer.Sound("sonidos/Perdedor.mp3")
@@ -207,8 +207,11 @@ class Pantalla_juego2:
 
             if EstadoJuego.velocidad < 0.1:
                 EstadoJuego.girando = False
+
+                # Detener el sonido cuando termina de girar
                 if self.sonido_ruleta_canal is not None:
                     self.sonido_ruleta_canal.stop()
+
                 if not EstadoJuego.resultado_guardado:
                     self.resultado_final = obtener_numero(EstadoJuego.bola_angulo - EstadoJuego.angulo_ruleta)
                     color = (

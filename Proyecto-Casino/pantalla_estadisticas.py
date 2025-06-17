@@ -57,10 +57,15 @@ class PantallaEstadisticas:
                     cantidades.append(self.frecuencias[i])
                     colores_barras.append("green" if i == 0 else "red" if i in rojos else "black")
 
-            plt.figure(figsize=(9, 4), dpi=200)
-            plt.bar(numeros, cantidades, color=colores_barras)
-            plt.xticks(numeros, fontsize=9)
-            plt.yticks(fontsize=9)
+            plt.figure(figsize=(14, 6), dpi=200)  # Más ancho que alto
+            bar_width = 0.6  # Más delgado para dejar espacio entre barras
+            bars = plt.bar(numeros, cantidades, color=colores_barras, width=bar_width, align='center', edgecolor='gray', linewidth=0.8)
+            plt.xticks(numeros, fontsize=11)
+            plt.yticks(fontsize=11)
+            plt.xlabel("Número", fontsize=13)
+            plt.ylabel("Frecuencia", fontsize=13)
+            plt.grid(axis='y', linestyle='--', alpha=0.4)
+            plt.subplots_adjust(left=0.06, right=0.98, top=0.95, bottom=0.13)  # Usa más espacio del cuadro
             plt.tight_layout()
             plt.savefig("grafico_barras.png")
             plt.close()
@@ -74,14 +79,14 @@ class PantallaEstadisticas:
                     valores.append(count)
                     colores_pie.append("red" if color == "rojo" else "black" if color == "negro" else "green")
 
-            plt.figure(figsize=(4.5, 4.5), dpi=200)
+            plt.figure(figsize=(9, 9), dpi=200)  # <-- También puedes agrandar el gráfico aquí
             wedges, texts, autotexts = plt.pie(
                 valores, labels=labels, colors=colores_pie, autopct='%1.1f%%',
-                startangle=90, textprops={'color': 'white', 'fontsize': 12}
+                startangle=90, textprops={'color': 'white', 'fontsize': 18}  # <-- Aumenta el tamaño de fuente
             )
             for text in autotexts:
                 text.set_color("white")
-                text.set_fontsize(13)
+                text.set_fontsize(32)  # <-- Aumenta el tamaño de los porcentajes
 
             plt.tight_layout()
             plt.savefig("grafico_pastel.png")
@@ -129,85 +134,108 @@ class PantallaEstadisticas:
     def dibujar(self, ventana):
         ventana.fill(BLANCO)
 
-        # Total de giros arriba del todo centrado con borde negro
-        total_txt = fuente.render(f"Total de giros: {self.total}", True, NEGRO)
-        ventana.blit(total_txt, (ANCHO // 2 - total_txt.get_width() // 2, 10))
-        pygame.draw.rect(ventana, NEGRO, (ANCHO // 2 - total_txt.get_width() // 2 - 10, 8, total_txt.get_width() + 20, total_txt.get_height() + 4), 1)
+        # Título pequeño en caja discreta arriba a la izquierda
+        titulo_font = pygame.font.SysFont("Arial", 22, bold=True)
+        total_txt = titulo_font.render(f"Total de giros: {self.total}", True, NEGRO)
+        box_w, box_h = total_txt.get_width() + 32, total_txt.get_height() + 16
+        pygame.draw.rect(ventana, (245,245,245), (40, 18, box_w, box_h), border_radius=10)
+        pygame.draw.rect(ventana, (200,200,200), (40, 18, box_w, box_h), 1, border_radius=10)
+        ventana.blit(total_txt, (40 + 16, 18 + 8))
+
+        # --- BOTONES ARRIBA, alineados A LA DERECHA ---
+        boton_ancho = 90
+        boton_alto = 32
+        espacio_btns = 12
+        total_botones_w = (boton_ancho + espacio_btns) * 3 - espacio_btns
+        x_botones = ANCHO - 40 - total_botones_w
+        y_botones = 18 + (box_h - boton_alto) // 2
+
+        self.boton_recomendaciones = pygame.Rect(x_botones, y_botones, boton_ancho, boton_alto)
+        self.boton_volver = pygame.Rect(x_botones + boton_ancho + espacio_btns, y_botones, boton_ancho, boton_alto)
+        self.boton_exportar = pygame.Rect(x_botones + 2 * (boton_ancho + espacio_btns), y_botones, boton_ancho, boton_alto)
+
+        pygame.draw.rect(ventana, (100, 200, 100), self.boton_recomendaciones, border_radius=8)
+        texto_reco_btn = pequena.render("Sugerencias", True, (0, 0, 0))
+        ventana.blit(texto_reco_btn, (self.boton_recomendaciones.centerx - texto_reco_btn.get_width() // 2, self.boton_recomendaciones.centery - texto_reco_btn.get_height() // 2))
+
+        pygame.draw.rect(ventana, (180, 180, 0), self.boton_volver, border_radius=8)
+        texto_btn = pequena.render("Volver", True, (0, 0, 0))
+        ventana.blit(texto_btn, (self.boton_volver.centerx - texto_btn.get_width() // 2, self.boton_volver.centery - texto_btn.get_height() // 2))
+
+        pygame.draw.rect(ventana, (0, 120, 255), self.boton_exportar, border_radius=8)
+        texto_exp = pequena.render("CSV", True, (255, 255, 255))
+        ventana.blit(texto_exp, (self.boton_exportar.centerx - texto_exp.get_width() // 2, self.boton_exportar.centery - texto_exp.get_height() // 2))
 
         # Gráfico de barras
+        grafico_h = 320
+        grafico_w = ANCHO - 80
+        grafico_x = 40
+        grafico_y = 18 + box_h + 10
         if os.path.exists("grafico_barras.png"):
             img_barra = pygame.image.load("grafico_barras.png")
-            img_barra = pygame.transform.scale(img_barra, (820, 180))
-            ventana.blit(img_barra, (ANCHO // 2 - 410, 50))
+            img_barra = pygame.transform.smoothscale(img_barra, (grafico_w, grafico_h))
+            ventana.blit(img_barra, (grafico_x, grafico_y))
 
-        # Gráfico de pastel
+        # Cuadro para datos y gráfico de pastel
+        cuadro_x = 50
+        cuadro_y = grafico_y + grafico_h + 10
+        cuadro_w = ANCHO - 90
+        cuadro_h = ALTO - cuadro_y - 50
+        pygame.draw.rect(ventana, (255,255,255), (cuadro_x, cuadro_y, cuadro_w, cuadro_h), border_radius=18)
+        pygame.draw.rect(ventana, (210,210,210), (cuadro_x, cuadro_y, cuadro_w, cuadro_h), 2, border_radius=18)
+
+        # División de columnas (60% tabla, 40% pastel)
+        col_div = cuadro_x + int(cuadro_w * 0.5)
+        margen_lateral = 20
+        margen_vertical = 20
+
+        # Calcula el área disponible para el gráfico de pastel
+        ancho_columna = cuadro_w * 0.4 - 2 * margen_lateral
+        alto_columna = cuadro_h - 2 * margen_vertical
+
+        # El gráfico de pastel ocupa todo el espacio disponible en la columna derecha
+        pastel_size = int(min(ancho_columna, alto_columna) * 1)
+
+        # Centrado en la columna derecha
+        pastel_x = int(col_div + (cuadro_x + cuadro_w - col_div - pastel_size) // 2)
+        pastel_y = int(cuadro_y + (cuadro_h - pastel_size) // 2)
+
         if os.path.exists("grafico_pastel.png"):
             img_pie = pygame.image.load("grafico_pastel.png")
-            img_pie = pygame.transform.scale(img_pie, (240, 240))
-            ventana.blit(img_pie, (80, 260))
+            img_pie = pygame.transform.smoothscale(img_pie, (pastel_size, pastel_size))
+            ventana.blit(img_pie, (pastel_x, pastel_y))
 
-        # Tabla de frecuencias
-        y_base = 260
-        x_col1 = 350
-        x_col2 = x_col1 + 70
-        x_col3 = x_col2 + 70
-        x_col4 = x_col3 + 80
-
-        ventana.blit(fuente.render("Num", True, NEGRO ), (x_col1, y_base))
-        ventana.blit(fuente.render("Freq", True, NEGRO), (x_col2, y_base))
-        ventana.blit(fuente.render("%", True, NEGRO), (x_col3 + 5, y_base))
-        ventana.blit(fuente.render("Color", True, NEGRO), (x_col4, y_base))
-        y_base += 30
+        # --- TABLA IZQUIERDA ---
+        tabla_x = cuadro_x + 30
+        tabla_y = cuadro_y + 18
+        col_w = 70
+        header_font = pygame.font.SysFont("Arial", 18, bold=True)
+        cell_font = pygame.font.SysFont("Arial", 15)
+        headers = ["Num", "Frec.", "%", "Color"]
+        for i, h in enumerate(headers):
+            ventana.blit(header_font.render(h, True, NEGRO), (tabla_x + i * col_w, tabla_y))
 
         filas = [(i, self.frecuencias[i]) for i in range(37) if self.frecuencias[i] > 0]
-        filas_visibles = 12
+        filas_visibles = int((cuadro_h - 60) // 22)
         self.max_scroll = max(0, len(filas) - filas_visibles)
+        y_base = tabla_y + 24
         for idx in range(self.scroll_offset, min(self.scroll_offset + filas_visibles, len(filas))):
             i, freq = filas[idx]
             porcentaje = (freq / self.total) * 100
             color = "verde" if i == 0 else "rojo" if i in rojos else "negro"
-            ventana.blit(pequena.render(str(i), True, NEGRO), (x_col1, y_base))
-            ventana.blit(pequena.render(str(freq), True, NEGRO), (x_col2, y_base))
-            ventana.blit(pequena.render(f"{porcentaje:.1f}%", True, NEGRO), (x_col3, y_base))
-            ventana.blit(pequena.render(color, True, NEGRO), (x_col4, y_base))
+            ventana.blit(cell_font.render(str(i), True, NEGRO), (tabla_x, y_base))
+            ventana.blit(cell_font.render(str(freq), True, NEGRO), (tabla_x + col_w, y_base))
+            ventana.blit(cell_font.render(f"{porcentaje:.1f}%", True, NEGRO), (tabla_x + 2 * col_w, y_base))
+            ventana.blit(cell_font.render(color, True, NEGRO), (tabla_x + 3 * col_w, y_base))
             y_base += 22
 
         # Indicador de scroll
         if self.max_scroll > 0:
-            scroll_text = pequena.render(f"▲▼ ({self.scroll_offset+1}-{min(self.scroll_offset+filas_visibles, len(filas))}/{len(filas)})", True, NEGRO)
-            ventana.blit(scroll_text, (x_col4 + 60, 260))
-
-       
-
-        # Botones
-        boton_ancho = 90
-        boton_alto = 30
-        espacio_botones = 12
-        margen_derecho = 30
-        margen_inferior = 20
-
-        self.boton_exportar = pygame.Rect(ANCHO - boton_ancho - margen_derecho, ALTO - boton_alto - margen_inferior, boton_ancho, boton_alto)
-        self.boton_volver = pygame.Rect(ANCHO - 2 * boton_ancho - espacio_botones - margen_derecho, ALTO - boton_alto - margen_inferior, boton_ancho, boton_alto)
-
-        pygame.draw.rect(ventana, (180, 180, 0), self.boton_volver, border_radius=8)
-        texto_btn = fuente.render("Volver", True, (0, 0, 0))
-        ventana.blit(texto_btn, (self.boton_volver.centerx - texto_btn.get_width() // 2, self.boton_volver.centery - texto_btn.get_height() // 2))
-
-        pygame.draw.rect(ventana, (0, 120, 255), self.boton_exportar, border_radius=8)  # Azul
-        texto_exp = fuente.render("CSV", True, (255, 255, 255))
-        ventana.blit(texto_exp, (self.boton_exportar.centerx - texto_exp.get_width() // 2, self.boton_exportar.centery - texto_exp.get_height() // 2))
-
-        # Nuevo botón verde "Recomendaciones"
-        self.boton_recomendaciones = pygame.Rect(ANCHO - 3 * boton_ancho - 2 * espacio_botones - margen_derecho,ALTO - boton_alto - margen_inferior,boton_ancho,boton_alto)
-        pygame.draw.rect(ventana, (100, 200, 100), self.boton_recomendaciones, border_radius=8)
-        texto_reco_btn = pequena.render("Sugerencias", True, (0, 0, 0))
-        ventana.blit(
-            texto_reco_btn,
-            (
-                self.boton_recomendaciones.centerx - texto_reco_btn.get_width() // 2,
-                self.boton_recomendaciones.centery - texto_reco_btn.get_height() // 2
+            scroll_text = pequena.render(
+                f"▲▼ ({self.scroll_offset+1}-{min(self.scroll_offset+filas_visibles, len(filas))}/{len(filas)})",
+                True, (120,120,120)
             )
-        )
+            ventana.blit(scroll_text, (tabla_x + 4 * col_w + 8, tabla_y))
 
     def generar_recomendaciones(self):
         # Consejos generales (sin datos)
