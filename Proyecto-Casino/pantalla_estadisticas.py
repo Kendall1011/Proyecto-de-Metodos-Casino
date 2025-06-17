@@ -213,11 +213,11 @@ class PantallaEstadisticas:
         # Consejos generales (sin datos)
         consejos_generales = [
             "Recuerda que la ruleta es un juego de azar, juega de manera responsable.",
-            "No apuestes grandes sumas en una sola jugada; distribuye tu capital para minimizar riesgos.",
+            "No apuestes grandes sumas en una sola jugada, distribuye tu capital para minimizar riesgos.",
             "Si detectas una tendencia, puedes aprovecharla, pero no confíes en que continuará indefinidamente.",
             "Consulta las estadísticas regularmente para ajustar tu estrategia.",
             "Establece un límite de pérdidas y respétalo para evitar decisiones impulsivas.",
-            "El objetivo principal es disfrutar el juego. ¡Juega con responsabilidad!"
+            "El objetivo principal es disfrutar el juego ¡Juega con responsabilidad!."
         ]
 
         recomendaciones = []
