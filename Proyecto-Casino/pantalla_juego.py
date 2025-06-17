@@ -108,8 +108,15 @@ class PantallaJuego:
                 EstadoJuego.apuestas.clear()
 
             elif self.boton_repetir.collidepoint(x, y):
-                EstadoJuego.apuestas.clear()
-                EstadoJuego.apuestas.extend(EstadoJuego.apuesta_anterior)
+                # Calcular el costo total de repetir las apuestas
+                total_repetir = 0
+                for apuesta, idx in EstadoJuego.apuesta_anterior:
+                    total_repetir += valor_ficha(fichas[idx][1])
+                if estado_juego.dinero_j1 >= total_repetir:
+                    EstadoJuego.apuestas.clear()
+                    EstadoJuego.apuestas.extend(EstadoJuego.apuesta_anterior)
+                    estado_juego.dinero_j1 -= total_repetir
+                # Si no hay suficiente dinero, no repite la apuesta
 
             elif self.boton_estadisticas.collidepoint(x, y):
                 self.cambiar_pantalla("estadisticas")
@@ -276,3 +283,10 @@ class PantallaJuego:
             ventana.blit(texto_alerta, texto_alerta.get_rect(center=(ANCHO//2, y_btn + 25)))
             ventana.blit(texto_sindinero, texto_sindinero.get_rect(center=(ANCHO//2, y_btn + 55)))
             ventana.blit(texto_reiniciar, texto_reiniciar.get_rect(center=(ANCHO//2, y_btn + 75)))
+
+        if EstadoJuego.mensaje_resultado == "¡Ganaste!":
+            self.flash_j1 = "verde"
+        elif EstadoJuego.mensaje_resultado == "Perdiste":
+            self.flash_j1 = "rojo"
+        else:
+            self.flash_j1 = None  # No cambia color si no hubo apuesta

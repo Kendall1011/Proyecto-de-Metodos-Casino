@@ -233,6 +233,6 @@ class PantallaEstadisticas:
         zona_mas_frecuente = max(zonas, key=zonas.get)
         veces_zona = zonas[zona_mas_frecuente]
         porcentaje_zona = (veces_zona / self.total) * 100 if self.total > 0 else 0
-        recomendaciones.append(f"La zona {zona_mas_frecuente} es la más frecuente ({porcentaje_zona:.2f}% de los giros en esa zona).")
+        recomendaciones.append(f"La zona {zona_mas_frecuente} es la más frecuente ({porcentaje_zona:.2f}% de los giros son de esa zona).")
 
         return recomendaciones
