@@ -311,10 +311,4 @@ class PantallaEstadisticas:
                     f"Han salido más números altos (19-36): {altos} veces, que bajos (1-18): {bajos} veces."
                 )
 
-            # Rachas de color
-            if veces_color >= 3:
-                recomendaciones.append(
-                    f"¡Atención! El color {color_mas_frecuente} lleva una racha de {veces_color} apariciones."
-                )
-
         return consejos_generales, recomendaciones
