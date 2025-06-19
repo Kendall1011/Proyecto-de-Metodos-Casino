@@ -8,7 +8,7 @@ from funciones_dibujo import (
     dibujar_ruleta, dibujar_bolita, dibujar_tablero,
     dibujar_apuestas_color, obtener_numero, dibujar_ficha_estilo_casino
 )
-from validaciones_apuestas import es_apuesta_ganadora, validar_apuestas
+from validaciones_apuestas import validar_apuestas
 
 def valor_ficha(valor):
     valores = {
@@ -27,35 +27,12 @@ def multiplicador_apuesta(apuesta):
     return 0
 
 def es_apuesta_valida(apuestas, nueva_apuesta):
+    # Extrae solo el tipo de apuesta si es una tupla
     tipos = [a[0] if isinstance(a, tuple) else a for a in apuestas]
-
-    # No permitir ROJO y NEGRO juntos
-    if (("ROJO" in tipos and nueva_apuesta == "NEGRO") or
-        ("NEGRO" in tipos and nueva_apuesta == "ROJO")):
-        return False
-
-    # No permitir PAR e IMPAR juntos
-    if (("PAR" in tipos and nueva_apuesta == "IMPAR") or
-        ("IMPAR" in tipos and nueva_apuesta == "PAR")):
-        return False
-
-    return True
-
-    docenas = {
-        "1st 12": range(1, 13),
-        "2nd 12": range(13, 25),
-        "3rd 12": range(25, 37)
-    }
-    if nueva_apuesta in docenas:
-        for t in tipos:
-            if isinstance(t, int) and t not in docenas[nueva_apuesta]:
-                return False
-    if isinstance(nueva_apuesta, int):
-        for d, nums in docenas.items():
-            if d in tipos and nueva_apuesta not in nums:
-                return False
-
-    return True
+    # Agrega la nueva apuesta a la lista temporal
+    tipos.append(nueva_apuesta)
+    # Usa la función centralizada de validación
+    return validar_apuestas(tipos, None)
 
 
 class Pantalla_juego2:
