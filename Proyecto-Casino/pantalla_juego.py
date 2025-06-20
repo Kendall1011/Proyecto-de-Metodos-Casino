@@ -56,8 +56,6 @@ class PantallaJuego:
         self.sonido_ruleta = pygame.mixer.Sound("sonidos/roulette-spin.mp3")
         self.sonido_ruleta.set_volume(0.7)
         self.sonido_ruleta_canal = None
-
-        # NUEVO: Cargar sonidos adicionales
         self.sonido_apostar = pygame.mixer.Sound("sonidos/Apostar.mp3")
         self.sonido_apostar.set_volume(0.7)
         self.sonido_perdedor = pygame.mixer.Sound("sonidos/Perdedor.mp3")
