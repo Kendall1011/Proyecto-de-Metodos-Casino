@@ -71,6 +71,10 @@ class PantallaJuego:
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
 
+            # NO permitir apostar si la ruleta está girando
+            if EstadoJuego.girando:
+                return
+
             if getattr(self, "mostrar_reiniciar", False):
                 if hasattr(self, "boton_reiniciar") and self.boton_reiniciar.collidepoint(x, y):
                     estado_juego.dinero_j1 = 100000

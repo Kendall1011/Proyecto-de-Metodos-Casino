@@ -86,6 +86,10 @@ class Pantalla_juego2:
         if evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
 
+            # NO permitir apostar si la ruleta está girando
+            if EstadoJuego.girando:
+                return
+
             if self.boton_casa.collidepoint(x, y):
                 self.cambiar_pantalla("inicio")
             elif self.boton_estadisticas.collidepoint(x, y):
@@ -449,7 +453,7 @@ class Pantalla_juego2:
 
         # Botón de reinicio si ambos están en 0
         if self.mostrar_reiniciar:
-            ancho_btn = 300
+            ancho_btn = 370  # Antes: 300
             alto_btn = 100
             x_btn = ANCHO // 2 - ancho_btn // 2
             y_btn = 200
